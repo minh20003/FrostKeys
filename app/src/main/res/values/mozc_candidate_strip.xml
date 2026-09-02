@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Japanese, Chinese, Korean, and Thai intentionally inherit this English fallback
+    in the personal VN build. Vietnamese completeness is enforced separately by
+    verifyVietnameseTranslationParity.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="mozc_mode_hiragana">Hiragana</string>
+    <string name="mozc_mode_katakana">Katakana</string>
+    <string name="mozc_mode_latin">Latin</string>
+    <string name="mozc_mode_selector">Input mode: %1$s</string>
+    <string name="mozc_candidate_previous_page">Previous candidate page</string>
+    <string name="mozc_candidate_next_page">Next candidate page</string>
+    <string name="mozc_cancel_composition">Cancel Japanese composition</string>
+    <string name="mozc_candidate_number">Candidate %1$d: %2$s</string>
+    <string name="mozc_candidates_loading">Loading Japanese input…</string>
+    <string name="mozc_candidates_ready">Type Romaji to convert</string>
+    <string name="mozc_candidates_empty">No conversion candidates</string>
+    <string name="mozc_candidates_unavailable">Japanese conversion is unavailable</string>
+</resources>

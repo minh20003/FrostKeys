@@ -1,0 +1,798 @@
+/*
+ * Copyright (C) 2013 The Android Open Source Project
+ * modified
+ * SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
+ */
+
+package helium314.keyboard.latin.settings;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.view.ContextThemeWrapper;
+import android.view.inputmethod.EditorInfo;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+
+import helium314.keyboard.compat.ConfigurationCompatKt;
+import helium314.keyboard.keyboard.KeyboardActionListener;
+import helium314.keyboard.keyboard.KeyboardTheme;
+import helium314.keyboard.keyboard.internal.PopupKeySpec;
+import helium314.keyboard.latin.AudioAndHapticFeedbackManager;
+import helium314.keyboard.latin.InputAttributes;
+import helium314.keyboard.latin.PunctuationSuggestions;
+import helium314.keyboard.latin.R;
+import helium314.keyboard.latin.RichInputMethodManager;
+import helium314.keyboard.latin.RichInputMethodSubtype;
+import helium314.keyboard.latin.common.StringUtils;
+import helium314.keyboard.latin.utils.DeviceProtectedUtils;
+import helium314.keyboard.latin.utils.FoldableUtils;
+import helium314.keyboard.latin.utils.KtxKt;
+import helium314.keyboard.latin.utils.LayoutType;
+import helium314.keyboard.latin.utils.Log;
+import helium314.keyboard.latin.utils.ResourceUtils;
+import helium314.keyboard.latin.utils.RunInLocaleKt;
+import helium314.keyboard.latin.utils.StatsUtils;
+import helium314.keyboard.latin.utils.SubtypeSettings;
+import helium314.keyboard.latin.utils.ToolbarKey;
+import helium314.keyboard.latin.utils.ToolbarUtilsKt;
+import helium314.keyboard.latin.utils.ToolbarMode;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.concurrent.locks.ReentrantLock;
+
+public final class Settings implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String TAG = Settings.class.getSimpleName();
+
+    // theme-related stuff
+    public static final String PREF_THEME_STYLE = "theme_style";
+    public static final String PREF_ICON_STYLE = "icon_style";
+    public static final String PREF_THEME_COLORS = "theme_colors";
+    public static final String PREF_THEME_COLORS_NIGHT = "theme_colors_night";
+    public static final String PREF_THEME_KEY_BORDERS = "theme_key_borders";
+    public static final String PREF_THEME_DAY_NIGHT = "theme_auto_day_night";
+    public static final String PREF_USER_COLORS_PREFIX = "user_colors_";
+    public static final String PREF_USER_ALL_COLORS_PREFIX = "user_all_colors_";
+    public static final String PREF_USER_MORE_COLORS_PREFIX = "user_more_colors_";
+
+    public static final String PREF_FROSTED_BLUR_RADIUS = "pref_frosted_blur_radius";
+    public static final String PREF_FROSTED_KEY_TRANSPARENCY = "pref_frosted_key_transparency";
+    public static final String PREF_FROSTED_COLOR_BLEND = "pref_frosted_color_blend";
+    public static final String PREF_FROSTED_SATURATION = "pref_frosted_saturation";
+    public static final String PREF_FROSTED_BG_TRANSPARENCY = "pref_frosted_bg_transparency";
+    public static final String PREF_FROSTED_SPECIAL_VIBRANCY = "pref_frosted_special_vibrancy";
+    public static final String PREF_FROSTED_ALPHABET_VIBRANCY = "pref_frosted_alphabet_vibrancy";
+
+    public static final String PREF_FROSTED_BLUR_RADIUS_NIGHT = "pref_frosted_blur_radius_night";
+    public static final String PREF_FROSTED_KEY_TRANSPARENCY_NIGHT = "pref_frosted_key_transparency_night";
+    public static final String PREF_FROSTED_COLOR_BLEND_NIGHT = "pref_frosted_color_blend_night";
+    public static final String PREF_FROSTED_SATURATION_NIGHT = "pref_frosted_saturation_night";
+    public static final String PREF_FROSTED_BG_TRANSPARENCY_NIGHT = "pref_frosted_bg_transparency_night";
+    public static final String PREF_FROSTED_SPECIAL_VIBRANCY_NIGHT = "pref_frosted_special_vibrancy_night";
+    public static final String PREF_FROSTED_ALPHABET_VIBRANCY_NIGHT = "pref_frosted_alphabet_vibrancy_night";
+    public static final String PREF_FROSTED_DUST_ENABLED = "pref_frosted_dust_enabled";
+    public static final String PREF_FROSTED_DUST_ALPHA = "pref_frosted_dust_alpha";
+    public static final String PREF_FROSTED_DUST_ALPHA_NIGHT = "pref_frosted_dust_alpha_night";
+    public static final String PREF_FROSTED_GLASS_TRIGGER = "frosted_glass_trigger";
+    public static final String PREF_BLUR_RENDER_OVERRIDE = "blur_render_override";
+    public static final String PREF_NATIVE_BACKGROUND_BLUR_ONLY = "native_background_blur_only";
+
+    public static final String PREF_CUSTOM_ICON_NAMES = "custom_icon_names";
+    public static final String PREF_TOOLBAR_CUSTOM_KEY_CODES = "toolbar_custom_key_codes";
+    public static final String PREF_LAYOUT_PREFIX = "layout_";
+
+    public static final String PREF_AUTO_CAP = "auto_cap";
+    public static final String PREF_VIBRATE_ON = "vibrate_on";
+    public static final String PREF_VIBRATE_IN_DND_MODE = "vibrate_in_dnd_mode";
+    public static final String PREF_SOUND_ON = "sound_on";
+    public static final String PREF_SUGGEST_EMOJIS = "suggest_emojis";
+    public static final String PREF_INLINE_EMOJI_SEARCH = "inline_emoji_search";
+    public static final String PREF_SHOW_EMOJI_DESCRIPTIONS = "show_emoji_descriptions";
+    public static final String PREF_PERSISTENT_EMOJI_ROW = "persistent_emoji_row";
+    public static final String PREF_POPUP_ON = "popup_on";
+    public static final String PREF_AUTO_CORRECTION = "auto_correction";
+    public static final String PREF_MORE_AUTO_CORRECTION = "more_auto_correction";
+    public static final String PREF_AUTO_CORRECT_THRESHOLD = "auto_correct_threshold";
+    public static final String PREF_AUTOCORRECT_SHORTCUTS = "autocorrect_shortcuts";
+    public static final String PREF_BACKSPACE_REVERTS_AUTOCORRECT = "backspace_reverts_autocorrect";
+    public static final String PREF_CENTER_SUGGESTION_TEXT_TO_ENTER = "center_suggestion_text_to_enter";
+    public static final String PREF_SHOW_SUGGESTIONS = "show_suggestions";
+    public static final String PREF_ALWAYS_SHOW_SUGGESTIONS = "always_show_suggestions";
+    public static final String PREF_ALWAYS_SHOW_SUGGESTIONS_EXCEPT_WEB_TEXT = "always_show_suggestions_except_web_text";
+    public static final String PREF_KEY_USE_PERSONALIZED_DICTS = "use_personalized_dicts";
+    public static final String PREF_KEY_USE_DOUBLE_SPACE_PERIOD = "use_double_space_period";
+    public static final String PREF_BLOCK_POTENTIALLY_OFFENSIVE = "block_potentially_offensive";
+    public static final String PREF_SHOW_LANGUAGE_SWITCH_KEY = "show_language_switch_key";
+    public static final String PREF_LANGUAGE_SWITCH_KEY = "language_switch_key";
+    public static final String PREF_SHOW_EMOJI_KEY = "show_emoji_key";
+    public static final String PREF_VARIABLE_TOOLBAR_DIRECTION = "var_toolbar_direction";
+    public static final String PREF_ADDITIONAL_SUBTYPES = "additional_subtypes";
+    public static final String PREF_ENABLE_SPLIT_KEYBOARD = "split_keyboard";
+    public static final String PREF_ENABLE_SPLIT_KEYBOARD_LANDSCAPE = "split_keyboard_landscape";
+    public static final String PREF_ENABLE_SPLIT_KEYBOARD_FOLDED = "split_keyboard_folded";
+    public static final String PREF_ENABLE_SPLIT_KEYBOARD_FOLDED_LANDSCAPE = "split_keyboard_folded_landscape";
+    public static final String PREF_KEYBOARD_CORNER_RADIUS = "keyboard_corner_radius";
+    public static final int KEYBOARD_CORNER_RADIUS_MIN_DP = 0;
+    public static final int KEYBOARD_CORNER_RADIUS_MAX_DP = 32;
+    public static final String PREF_SPLIT_SPACER_SCALE_PREFIX = "split_spacer_scale";
+    public static final String PREF_KEYBOARD_HEIGHT_SCALE_PREFIX = "keyboard_height_scale";
+    public static final float KEYBOARD_HEIGHT_SCALE_MIN = 0.3f;
+    public static final float KEYBOARD_HEIGHT_SCALE_MAX = 1.5f;
+    public static final String PREF_BOTTOM_ROW_SCALE_PREFIX = "bottom_row_scale";
+    public static final String PREF_BOTTOM_PADDING_SCALE_PREFIX = "bottom_padding_scale";
+    public static final float BOTTOM_PADDING_SCALE_MIN = 0.0f;
+    public static final float BOTTOM_PADDING_SCALE_MAX = 5.0f;
+    public static final String PREF_SIDE_PADDING_SCALE_PREFIX = "side_padding_scale";
+    public static final String PREF_FONT_SCALE = "font_scale";
+    public static final String PREF_EMOJI_FONT_SCALE = "emoji_font_scale";
+    public static final String PREF_EMOJI_KEY_FIT = "emoji_key_fit";
+    public static final String PREF_EMOJI_SKIN_TONE = "emoji_skin_tone";
+    public static final String PREF_SPACE_HORIZONTAL_SWIPE = "horizontal_space_swipe";
+    public static final String PREF_SPACE_VERTICAL_SWIPE = "vertical_space_swipe";
+    public static final String PREF_DELETE_SWIPE = "delete_swipe";
+    public static final String PREF_AUTOSPACE_AFTER_PUNCTUATION = "autospace_after_punctuation";
+    public static final String PREF_AUTOSPACE_AFTER_SUGGESTION = "autospace_after_suggestion";
+    public static final String PREF_AUTOSPACE_AFTER_GESTURE_TYPING = "autospace_after_gesture_typing";
+    public static final String PREF_AUTOSPACE_BEFORE_GESTURE_TYPING = "autospace_before_gesture_typing";
+    public static final String PREF_SHIFT_REMOVES_AUTOSPACE = "shift_removes_autospace";
+    public static final String PREF_ALWAYS_INCOGNITO_MODE = "always_incognito_mode";
+    public static final String PREF_BIGRAM_PREDICTIONS = "next_word_prediction";
+    public static final String PREF_SUGGEST_PUNCTUATION = "suggest_punctuation";
+    public static final String PREF_PUNCTUATION_SUGGESTIONS = "punctuation_suggestions";
+    public static final String PREF_SUGGEST_CLIPBOARD_CONTENT = "suggest_clipboard_content";
+    public static final String PREF_GESTURE_INPUT = "gesture_input";
+    public static final String PREF_VIBRATION_DURATION_SETTINGS = "vibration_duration_settings";
+    public static final String PREF_KEYPRESS_SOUND_VOLUME = "keypress_sound_volume";
+    public static final String PREF_KEY_LONGPRESS_TIMEOUT = "key_longpress_timeout";
+    public static final String PREF_ENABLE_EMOJI_ALT_PHYSICAL_KEY = "enable_emoji_alt_physical_key";
+    public static final String PREF_GESTURE_PREVIEW_TRAIL = "gesture_preview_trail";
+    public static final String PREF_GESTURE_FLOATING_PREVIEW_TEXT = "gesture_floating_preview_text";
+    public static final String PREF_GESTURE_FLOATING_PREVIEW_DYNAMIC = "gesture_floating_preview_dynamic";
+    public static final String PREF_GESTURE_DYNAMIC_PREVIEW_FOLLOW_SYSTEM = "gesture_dynamic_preview_follow_system";
+    public static final String PREF_GESTURE_SPACE_AWARE = "gesture_space_aware";
+    public static final String PREF_GESTURE_FAST_TYPING_COOLDOWN = "gesture_fast_typing_cooldown";
+    public static final String PREF_GESTURE_TRAIL_FADEOUT_DURATION = "gesture_trail_fadeout_duration";
+    public static final String PREF_SHOW_SETUP_WIZARD_ICON = "show_setup_wizard_icon";
+    public static final String PREF_USE_CONTACTS = "use_contacts";
+    public static final String PREF_USE_APPS = "use_apps";
+    public static final String PREFS_LONG_PRESS_SYMBOLS_FOR_NUMPAD = "long_press_symbols_for_numpad";
+
+    public static final String PREF_ONE_HANDED_MODE_PREFIX = "one_handed_mode_enabled";
+    public static final String PREF_ONE_HANDED_GRAVITY_PREFIX = "one_handed_mode_gravity";
+    public static final String PREF_ONE_HANDED_SCALE_PREFIX = "one_handed_mode_scale";
+
+    public static final String PREF_SHOW_NUMBER_ROW = "show_number_row";
+    public static final String PREF_SHOW_NUMBER_ROW_IN_SYMBOLS = "show_number_row_in_symbols";
+    public static final String PREF_LOCALIZED_NUMBER_ROW = "localized_number_row";
+    public static final String PREF_SHOW_NUMBER_ROW_HINTS = "show_number_row_hints";
+    public static final String PREF_CUSTOM_CURRENCY_KEY = "custom_currency_key";
+
+    public static final String PREF_SHOW_HINTS = "show_hints";
+    public static final String PREF_POPUP_KEYS_ORDER = "popup_keys_order";
+    public static final String PREF_POPUP_KEYS_HINT_ORDER = "popup_keys_labels_order";
+    public static final String PREF_SHOW_POPUP_HINTS = "show_popup_hints";
+    public static final String PREF_MORE_POPUP_KEYS = "more_popup_keys";
+    public static final String PREF_SHOW_TLD_POPUP_KEYS = "show_tld_popup_keys";
+
+    public static final String PREF_SPACE_TO_CHANGE_LANG = "prefs_long_press_keyboard_to_change_lang";
+    public static final String PREF_LANGUAGE_SWIPE_DISTANCE = "language_swipe_distance";
+    public static final String PREF_TOUCHPAD_SENSITIVITY = "touchpad_sensitivity";
+    public static final String PREF_TOUCHPAD_EDGE_SCROLL = "touchpad_edge_scroll";
+
+    public static final String PREF_ENABLE_CLIPBOARD_HISTORY = "enable_clipboard_history";
+    public static final String PREF_SHOW_SCREENSHOTS_IN_CLIPBOARD = "show_screenshots_in_clipboard";
+    public static final String PREF_CLIPBOARD_HISTORY_RETENTION_TIME = "clipboard_history_retention_time";
+    public static final String PREF_CLIPBOARD_HISTORY_PINNED_FIRST = "clipboard_history_pinned_first";
+
+    public static final String PREF_ADD_TO_PERSONAL_DICTIONARY = "add_to_personal_dictionary";
+    public static final String PREF_NAVBAR_COLOR = "navbar_color";
+    public static final String PREF_NARROW_KEY_GAPS = "narrow_key_gaps";
+    public static final String PREF_ENABLED_SUBTYPES = "enabled_subtypes";
+    public static final String PREF_SELECTED_SUBTYPE = "selected_subtype";
+    /** Tone placement convention for Vietnamese Telex/VNI: common (hòa) or alternate (hoà). */
+    public static final String PREF_VIETNAMESE_TONE_PLACEMENT = "vietnamese_tone_placement";
+    public static final String PREF_URL_DETECTION = "url_detection";
+    public static final String PREF_DONT_SHOW_MISSING_DICTIONARY_DIALOG = "dont_show_missing_dict_dialog";
+    public static final String PREF_QUICK_PIN_TOOLBAR_KEYS = "quick_pin_toolbar_keys";
+    public static final String PREF_PINNED_TOOLBAR_KEYS = "pinned_toolbar_keys";
+    public static final String PREF_PERSISTENT_TOOLBAR_KEY = "persistent_toolbar_key";
+    public static final String PREF_TOOLBAR_KEYS = "toolbar_keys";
+    public static final String PREF_AUTO_SHOW_TOOLBAR = "auto_show_toolbar";
+    public static final String PREF_AUTO_HIDE_TOOLBAR = "auto_hide_toolbar";
+    public static final String PREF_ABC_AFTER_EMOJI = "abc_after_emoji";
+    public static final String PREF_ABC_AFTER_CLIP = "abc_after_clip";
+    public static final String PREF_ABC_AFTER_SYMBOL_SPACE = "abc_after_symbol_space";
+    public static final String PREF_ABC_AFTER_NUMPAD_SPACE = "abc_after_numpad_space";
+    public static final String PREF_REMOVE_REDUNDANT_POPUPS = "remove_redundant_popups";
+    public static final String PREF_SPACE_BAR_TEXT = "space_bar_text";
+    public static final String PREF_TIMESTAMP_FORMAT = "timestamp_format";
+    public static final String PREF_TOOLBAR_MODE = "toolbar_mode";
+    public static final String PREF_TOOLBAR_HIDING_GLOBAL = "toolbar_hiding_global";
+    public static final String PREF_TOOLBAR_SWIPE_DOWN_TO_HIDE = "toolbar_swipe_down_to_hide";
+    public static final String PREF_SPELLCHECK_SUGGEST = "spellcheck_suggest";
+    public static final String PREF_SEND_GIFS_AS_STICKERS = "send_gifs_as_stickers";
+    /** Visual intensity for the optional AI writing-panel animation. */
+    public static final String PREF_AI_VISUAL_EFFECTS = "ai_visual_effects";
+    public static final String PREF_USE_5_WORD_SUGGESTION_CHIPS = "use_5_word_suggestion_chips";
+
+    // Translation preferences
+    public static final String PREF_TRANSLATION_QUALITY = "translation_quality";
+    public static final String PREF_TRANSLATION_SOURCE_LANGUAGE = "translation_source_language";
+    public static final String PREF_TRANSLATION_TARGET_LANGUAGE = "translation_target_language";
+    public static final String PREF_TRANSLATION_ON_DEVICE_FALLBACK = "translation_on_device_fallback";
+
+    // Emoji
+    public static final String PREF_EMOJI_MAX_SDK = "emoji_max_sdk";
+    public static final String PREF_EMOJI_RECENT_KEYS = "emoji_recent_keys";
+    public static final String PREF_LAST_SHOWN_EMOJI_CATEGORY_ID = "last_shown_emoji_category_id";
+    public static final String PREF_LAST_SHOWN_EMOJI_CATEGORY_PAGE_ID = "last_shown_emoji_category_page_id";
+
+    public static final String PREF_ADAPTIVE_METADATA = "pref_adaptive_emoji_metadata";
+    public static final String PREF_FAST_ROW_CACHE = "pref_adaptive_emoji_fast_row_cache";
+    public static final String PREF_FAST_ROW_LAST_REFRESH = "pref_adaptive_emoji_fast_row_last_refresh";
+
+    public static final String PREF_VERSION_CODE = "version_code";
+    public static final String PREF_LIBRARY_CHECKSUM = "lib_checksum";
+    public static final String PREF_SAVE_SUBTYPE_PER_APP = "save_subtype_per_app";
+    public static final String PREF_SAVED_APP_SUBTYPE_PREFIX = "saved_app_subtype_";
+
+    private Context mContext;
+    private SharedPreferences mPrefs;
+    private SettingsValues mSettingsValues;
+    private final ReentrantLock mSettingsValuesLock = new ReentrantLock();
+
+    // static cache for background images to avoid potentially slow reload on every
+    // settings reload
+    private final static Drawable[] sCachedBackgroundImages = new Drawable[4];
+
+    private static final Settings sInstance = new Settings();
+
+    // preferences that are not used in SettingsValues and thus should not trigger
+    // reload when changed
+    private static final HashSet<String> dontReloadOnChanged = new HashSet<>() {
+        {
+            add(PREF_LAST_SHOWN_EMOJI_CATEGORY_PAGE_ID);
+            add(PREF_LAST_SHOWN_EMOJI_CATEGORY_ID);
+            add(PREF_EMOJI_RECENT_KEYS);
+            add(PREF_DONT_SHOW_MISSING_DICTIONARY_DIALOG);
+            add(PREF_SELECTED_SUBTYPE);
+            add(PREF_FROSTED_BLUR_RADIUS);
+            add(PREF_FROSTED_KEY_TRANSPARENCY);
+            add(PREF_FROSTED_COLOR_BLEND);
+            add(PREF_FROSTED_SATURATION);
+            add(PREF_FROSTED_BG_TRANSPARENCY);
+            add(PREF_FROSTED_SPECIAL_VIBRANCY);
+            add(PREF_FROSTED_ALPHABET_VIBRANCY);
+            add(PREF_FROSTED_BLUR_RADIUS_NIGHT);
+            add(PREF_FROSTED_KEY_TRANSPARENCY_NIGHT);
+            add(PREF_FROSTED_COLOR_BLEND_NIGHT);
+            add(PREF_FROSTED_SATURATION_NIGHT);
+            add(PREF_FROSTED_BG_TRANSPARENCY_NIGHT);
+            add(PREF_FROSTED_SPECIAL_VIBRANCY_NIGHT);
+            add(PREF_FROSTED_ALPHABET_VIBRANCY_NIGHT);
+            add(PREF_FROSTED_DUST_ENABLED);
+            add(PREF_FROSTED_DUST_ALPHA);
+            add(PREF_FROSTED_DUST_ALPHA_NIGHT);
+            add(PREF_FROSTED_GLASS_TRIGGER);
+            add(PREF_BLUR_RENDER_OVERRIDE);
+            add(PREF_NATIVE_BACKGROUND_BLUR_ONLY);
+            add(PREF_ADAPTIVE_METADATA);
+            add(PREF_FAST_ROW_CACHE);
+            add(PREF_FAST_ROW_LAST_REFRESH);
+        }
+    };
+
+    public static Settings getInstance() {
+        return sInstance;
+    }
+
+    public static SettingsValues getValues() {
+        return sInstance.mSettingsValues;
+    }
+
+    public static Context getCurrentContext() {
+        return sInstance.mContext;
+    }
+
+    public static void init(final Context context) {
+        sInstance.onCreate(context);
+    }
+
+    private Settings() {
+        // Intentional empty constructor for singleton.
+    }
+
+    private void onCreate(final Context context) {
+        mContext = context;
+        mPrefs = KtxKt.prefs(context);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    public void onDestroy() {
+        mPrefs.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(final SharedPreferences prefs, final String key) {
+        if (dontReloadOnChanged.contains(key) || (key != null && key.startsWith(PREF_SAVED_APP_SUBTYPE_PREFIX)))
+            return;
+        mSettingsValuesLock.lock();
+        try {
+            if (mSettingsValues == null) {
+                // TODO: Introduce a static function to register this class and ensure that
+                // loadSettings must be called before "onSharedPreferenceChanged" is called.
+                Log.w(TAG, "onSharedPreferenceChanged called before loadSettings.");
+                return;
+            }
+            ToolbarUtilsKt.clearCustomToolbarKeyCodes();
+            loadSettings(mContext, mSettingsValues.mLocale, mSettingsValues.mInputAttributes);
+            StatsUtils.onLoadSettings(mSettingsValues);
+        } finally {
+            mSettingsValuesLock.unlock();
+        }
+        if (PREF_ADDITIONAL_SUBTYPES.equals(key)) {
+            SubtypeSettings.INSTANCE.reloadEnabledSubtypes(mContext);
+        }
+    }
+
+    /**
+     * convenience function for the rare situations where we need to load settings
+     * but may not have a keyboard
+     */
+    public void loadSettings(final Context context) {
+        if (mSettingsValues != null)
+            return;
+        final Locale locale = ConfigurationCompatKt.locale(context.getResources().getConfiguration());
+        final InputAttributes inputAttributes = new InputAttributes(new EditorInfo(), false, context.getPackageName());
+        loadSettings(context, locale, inputAttributes);
+    }
+
+    public void loadSettings(final Context context, final Locale locale,
+            @NonNull final InputAttributes inputAttributes) {
+        mSettingsValuesLock.lock();
+        mContext = context;
+        try {
+            final SharedPreferences prefs = mPrefs;
+            Log.i(TAG, "loadSettings");
+            mSettingsValues = RunInLocaleKt.runInLocale(context, locale,
+                    ctx -> new SettingsValues(ctx, prefs, ctx.getResources(), inputAttributes));
+        } finally {
+            mSettingsValuesLock.unlock();
+        }
+    }
+
+    public void stopListener() {
+        mPrefs.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    public void startListener() {
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    // TODO: Remove this method and add proxy method to SettingsValues.
+    public SettingsValues getCurrent() {
+        return mSettingsValues;
+    }
+
+    public static int readScreenMetrics(final Resources res) {
+        return res.getInteger(R.integer.config_screen_metrics);
+    }
+
+    public static boolean readVibrationEnabled(final SharedPreferences prefs) {
+        return prefs.getBoolean(PREF_VIBRATE_ON, Defaults.PREF_VIBRATE_ON)
+                && AudioAndHapticFeedbackManager.getInstance().hasVibrator();
+    }
+
+    public void toggleAutoCorrect() {
+        final boolean oldValue = mPrefs.getBoolean(PREF_AUTO_CORRECTION, Defaults.PREF_AUTO_CORRECTION);
+        mPrefs.edit().putBoolean(Settings.PREF_AUTO_CORRECTION, !oldValue).apply();
+    }
+
+    public static boolean readGestureDynamicPreviewEnabled(final SharedPreferences prefs) {
+        final boolean followSystem = prefs.getBoolean(PREF_GESTURE_DYNAMIC_PREVIEW_FOLLOW_SYSTEM,
+                Defaults.PREF_GESTURE_DYNAMIC_PREVIEW_FOLLOW_SYSTEM);
+        final boolean defValue = Defaults.PREF_GESTURE_DYNAMIC_PREVIEW_FOLLOW_SYSTEM;
+        final boolean curValue = prefs.getBoolean(Settings.PREF_GESTURE_FLOATING_PREVIEW_DYNAMIC, defValue);
+        return followSystem ? defValue : curValue;
+    }
+
+    public static boolean readGestureDynamicPreviewDefault(final Context context) {
+        // if transitions are disabled for the system (reduced motion), moving preview
+        // should be disabled
+        return SettingsKt.getTransitionAnimationScale(context) != 0.0f;
+    }
+
+    public static int readDefaultGestureFastTypingCooldown(final Resources res) {
+        return res.getInteger(R.integer.config_gesture_static_time_threshold_after_fast_typing);
+    }
+
+    public void toggleAlwaysIncognitoMode() {
+        final boolean oldValue = mPrefs.getBoolean(Settings.PREF_ALWAYS_INCOGNITO_MODE,
+                Defaults.PREF_ALWAYS_INCOGNITO_MODE);
+        mPrefs.edit().putBoolean(Settings.PREF_ALWAYS_INCOGNITO_MODE, !oldValue).apply();
+    }
+
+    public static ToolbarMode readToolbarMode(final SharedPreferences prefs) {
+        return ToolbarMode.valueOf(prefs.getString(PREF_TOOLBAR_MODE, Defaults.PREF_TOOLBAR_MODE));
+    }
+
+    public static KeyboardActionListener.SwipeAction readHorizontalSpaceSwipe(SharedPreferences prefs) {
+        try {
+            String value = prefs.getString(PREF_SPACE_HORIZONTAL_SWIPE, Defaults.PREF_SPACE_HORIZONTAL_SWIPE);
+            return KeyboardActionListener.SwipeAction.valueOf(value);
+        } catch (IllegalArgumentException e) {
+            return KeyboardActionListener.SwipeAction.NONE;
+        }
+    }
+
+    public static KeyboardActionListener.SwipeAction readVerticalSpaceSwipe(SharedPreferences prefs) {
+        try {
+            String value = prefs.getString(PREF_SPACE_VERTICAL_SWIPE, Defaults.PREF_SPACE_VERTICAL_SWIPE);
+            return KeyboardActionListener.SwipeAction.valueOf(value);
+        } catch (IllegalArgumentException e) {
+            return KeyboardActionListener.SwipeAction.NONE;
+        }
+    }
+
+    public static boolean readFullscreenModeAllowed(final Resources res) {
+        return res.getBoolean(R.bool.config_fullscreen_mode_allowed);
+    }
+
+    public static boolean readShowSetupWizardIcon(final SharedPreferences prefs,
+            final Context context) {
+        if (!prefs.contains(PREF_SHOW_SETUP_WIZARD_ICON)) {
+            final ApplicationInfo appInfo = context.getApplicationInfo();
+            final boolean isApplicationInSystemImage = (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            // Default value
+            return !isApplicationInSystemImage;
+        }
+        return prefs.getBoolean(PREF_SHOW_SETUP_WIZARD_ICON, Defaults.PREF_SHOW_SETUP_WIZARD_ICON);
+    }
+
+    public static boolean readOneHandedModeEnabled(SharedPreferences prefs, boolean landscape, boolean split,
+            boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, split, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_ONE_HANDED_MODE_PREFIX, index, 3);
+        return prefs.getBoolean(key, Defaults.PREF_ONE_HANDED_MODE);
+    }
+
+    public void writeOneHandedModeEnabled(final boolean enabled) {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, mSettingsValues.mIsSplitKeyboardEnabled,
+                FoldableUtils.INSTANCE.isFolded());
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_ONE_HANDED_MODE_PREFIX, index, 3);
+        mPrefs.edit().putBoolean(key, enabled).apply();
+    }
+
+    public static float readOneHandedModeScale(SharedPreferences prefs, boolean landscape, boolean split,
+            boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, split, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_ONE_HANDED_SCALE_PREFIX, index, 3);
+        return prefs.getFloat(key, Defaults.PREF_ONE_HANDED_SCALE);
+    }
+
+    public void writeOneHandedModeScale(final Float scale) {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, mSettingsValues.mIsSplitKeyboardEnabled,
+                FoldableUtils.INSTANCE.isFolded());
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_ONE_HANDED_SCALE_PREFIX, index, 3);
+        mPrefs.edit().putFloat(key, scale).apply();
+    }
+
+    public static int readOneHandedModeGravity(SharedPreferences prefs, boolean landscape, boolean split,
+            boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, split, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_ONE_HANDED_GRAVITY_PREFIX, index, 3);
+        return prefs.getInt(key, Defaults.PREF_ONE_HANDED_GRAVITY);
+    }
+
+    public void writeOneHandedModeGravity(final int gravity) {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, mSettingsValues.mIsSplitKeyboardEnabled,
+                FoldableUtils.INSTANCE.isFolded());
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_ONE_HANDED_GRAVITY_PREFIX, index, 3);
+        mPrefs.edit().putInt(key, gravity).apply();
+    }
+
+    public void writeSplitKeyboardEnabled(boolean enabled, boolean isLandscape, boolean isFolded) {
+        String pref = isLandscape
+                ? (isFolded ? PREF_ENABLE_SPLIT_KEYBOARD_FOLDED_LANDSCAPE : PREF_ENABLE_SPLIT_KEYBOARD_LANDSCAPE)
+                : (isFolded ? PREF_ENABLE_SPLIT_KEYBOARD_FOLDED : PREF_ENABLE_SPLIT_KEYBOARD);
+        mPrefs.edit().putBoolean(pref, enabled).apply();
+    }
+
+    public static boolean readSplitKeyboardEnabled(SharedPreferences prefs, boolean isLandscape, boolean isFolded) {
+        String pref = isLandscape
+                ? (isFolded ? PREF_ENABLE_SPLIT_KEYBOARD_FOLDED_LANDSCAPE : PREF_ENABLE_SPLIT_KEYBOARD_LANDSCAPE)
+                : (isFolded ? PREF_ENABLE_SPLIT_KEYBOARD_FOLDED : PREF_ENABLE_SPLIT_KEYBOARD);
+        return prefs.getBoolean(pref, Defaults.PREF_ENABLE_SPLIT_KEYBOARD);
+    }
+
+    public static float readSplitSpacerScale(SharedPreferences prefs, boolean landscape, boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        final Float[] defaults = Defaults.PREF_SPLIT_SPACER_SCALE;
+        final float defaultValue = defaults[index];
+        return prefs.getFloat(SettingsKt.createPrefKeyForBooleanSettings(PREF_SPLIT_SPACER_SCALE_PREFIX, index, 2),
+                defaultValue);
+    }
+
+    public static float readBottomPaddingScale(SharedPreferences prefs, boolean landscape, boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        final Float[] defaults = Defaults.PREF_BOTTOM_PADDING_SCALE;
+        float defaultValue = defaults[index];
+        if (index == 0
+                && KeyboardTheme.STYLE_DEFAULT.equals(prefs.getString(PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE))) {
+            defaultValue = 1.18f;
+        }
+        return prefs.getFloat(SettingsKt.createPrefKeyForBooleanSettings(PREF_BOTTOM_PADDING_SCALE_PREFIX, index, 2),
+                defaultValue);
+    }
+
+    public static float readSidePaddingScale(SharedPreferences prefs, boolean landscape, boolean split,
+            boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, split, folded);
+        final Float[] defaults = Defaults.PREF_SIDE_PADDING_SCALE;
+        float defaultValue = defaults[index];
+        if (index == 0
+                && KeyboardTheme.STYLE_DEFAULT.equals(prefs.getString(PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE))) {
+            defaultValue = 0.06f;
+        }
+        return prefs.getFloat(SettingsKt.createPrefKeyForBooleanSettings(PREF_SIDE_PADDING_SCALE_PREFIX, index, 3),
+                defaultValue);
+    }
+
+    public static float readHeightScale(SharedPreferences prefs, boolean landscape, boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        final Float[] defaults = Defaults.PREF_KEYBOARD_HEIGHT_SCALE;
+        final float defaultValue = defaults[index];
+        return prefs.getFloat(SettingsKt.createPrefKeyForBooleanSettings(PREF_KEYBOARD_HEIGHT_SCALE_PREFIX, index, 2),
+                defaultValue);
+    }
+
+    public void writeHeightScale(float scale) {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        final boolean folded = FoldableUtils.INSTANCE.isFolded();
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_KEYBOARD_HEIGHT_SCALE_PREFIX, index, 2);
+        float clampedScale = Math.max(KEYBOARD_HEIGHT_SCALE_MIN, Math.min(scale, KEYBOARD_HEIGHT_SCALE_MAX));
+        if (clampedScale == Defaults.PREF_KEYBOARD_HEIGHT_SCALE[index]) {
+            mPrefs.edit().remove(key).apply();
+        } else {
+            mPrefs.edit().putFloat(key, clampedScale).apply();
+        }
+    }
+
+    public void resetHeightScale() {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        final boolean folded = FoldableUtils.INSTANCE.isFolded();
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_KEYBOARD_HEIGHT_SCALE_PREFIX, index, 2);
+        mPrefs.edit().remove(key).apply();
+    }
+
+    public void writeBottomPaddingScale(float scale) {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        final boolean folded = FoldableUtils.INSTANCE.isFolded();
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_BOTTOM_PADDING_SCALE_PREFIX, index, 2);
+        float clampedScale = Math.max(BOTTOM_PADDING_SCALE_MIN, Math.min(scale, BOTTOM_PADDING_SCALE_MAX));
+        float defaultValue = Defaults.PREF_BOTTOM_PADDING_SCALE[index];
+        if (index == 0
+                && KeyboardTheme.STYLE_DEFAULT.equals(mPrefs.getString(PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE))) {
+            defaultValue = 1.18f;
+        }
+        if (clampedScale == defaultValue) {
+            mPrefs.edit().remove(key).apply();
+        } else {
+            mPrefs.edit().putFloat(key, clampedScale).apply();
+        }
+    }
+
+    public void writeKeyboardSizeScales(float heightScale, float bottomPaddingScale) {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        final boolean folded = FoldableUtils.INSTANCE.isFolded();
+        final int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        final String heightKey = SettingsKt.createPrefKeyForBooleanSettings(
+                PREF_KEYBOARD_HEIGHT_SCALE_PREFIX, index, 2);
+        final String bottomPaddingKey = SettingsKt.createPrefKeyForBooleanSettings(
+                PREF_BOTTOM_PADDING_SCALE_PREFIX, index, 2);
+        final float clampedHeightScale = Math.max(
+                KEYBOARD_HEIGHT_SCALE_MIN, Math.min(heightScale, KEYBOARD_HEIGHT_SCALE_MAX));
+        final float clampedBottomPaddingScale = Math.max(
+                BOTTOM_PADDING_SCALE_MIN, Math.min(bottomPaddingScale, BOTTOM_PADDING_SCALE_MAX));
+        final SharedPreferences.Editor editor = mPrefs.edit();
+
+        float bottomPaddingDefault = Defaults.PREF_BOTTOM_PADDING_SCALE[index];
+        if (index == 0
+                && KeyboardTheme.STYLE_DEFAULT.equals(mPrefs.getString(PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE))) {
+            bottomPaddingDefault = 1.18f;
+        }
+
+        putFloatOrRemoveDefault(
+                editor, heightKey, clampedHeightScale, Defaults.PREF_KEYBOARD_HEIGHT_SCALE[index]);
+        putFloatOrRemoveDefault(
+                editor, bottomPaddingKey, clampedBottomPaddingScale, bottomPaddingDefault);
+        if (!editor.commit()) {
+            Log.w(TAG, "Failed to persist keyboard resize scales");
+        }
+    }
+
+    private static void putFloatOrRemoveDefault(final SharedPreferences.Editor editor,
+            final String key, final float value, final float defaultValue) {
+        if (value == defaultValue) {
+            editor.remove(key);
+        } else {
+            editor.putFloat(key, value);
+        }
+    }
+
+    public void resetBottomPaddingScale() {
+        final boolean landscape = mSettingsValues.mDisplayOrientation == Configuration.ORIENTATION_LANDSCAPE;
+        final boolean folded = FoldableUtils.INSTANCE.isFolded();
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        String key = SettingsKt.createPrefKeyForBooleanSettings(PREF_BOTTOM_PADDING_SCALE_PREFIX, index, 2);
+        mPrefs.edit().remove(key).apply();
+    }
+
+    public static float readBottomRowScale(SharedPreferences prefs, boolean landscape, boolean folded) {
+        int index = SettingsKt.findIndexOfDefaultSetting(landscape, folded);
+        final Float[] defaults = Defaults.PREF_BOTTOM_ROW_SCALE;
+        final float defaultValue = defaults[index];
+        return prefs.getFloat(SettingsKt.createPrefKeyForBooleanSettings(PREF_BOTTOM_ROW_SCALE_PREFIX, index, 2),
+                defaultValue);
+    }
+
+    public static int readKeyboardCornerRadius(final SharedPreferences prefs) {
+        final int radius = prefs.getInt(PREF_KEYBOARD_CORNER_RADIUS, Defaults.PREF_KEYBOARD_CORNER_RADIUS);
+        return Math.max(KEYBOARD_CORNER_RADIUS_MIN_DP, Math.min(radius, KEYBOARD_CORNER_RADIUS_MAX_DP));
+    }
+
+    public static boolean readHasHardwareKeyboard(final Configuration conf) {
+        // The standard way of finding out whether we have a hardware keyboard. This
+        // code is taken
+        // from InputMethodService#onEvaluateInputShown, which canonically determines
+        // this.
+        // In a nutshell, we have a keyboard if the configuration says the type of
+        // hardware keyboard
+        // is NOKEYS and if it's not hidden (e.g. folded inside the device).
+        return conf.keyboard != Configuration.KEYBOARD_NOKEYS
+                && conf.hardKeyboardHidden != Configuration.HARDKEYBOARDHIDDEN_YES;
+    }
+
+    @Nullable
+    public static Drawable readUserBackgroundImage(final Context context, final boolean night) {
+        final boolean landscape = context.getResources()
+                .getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        final int index = (night ? 1 : 0) + (landscape ? 2 : 0);
+        if (sCachedBackgroundImages[index] != null)
+            return sCachedBackgroundImages[index];
+
+        File image = getCustomBackgroundFile(context, night, landscape);
+        if (!image.isFile() && landscape)
+            image = getCustomBackgroundFile(context, night, false); // fall back to portrait image for historic reasons
+        if (!image.isFile())
+            return null;
+        try {
+            final android.graphics.Bitmap bmp = BitmapFactory.decodeFile(image.getAbsolutePath());
+            if (bmp == null)
+                return null;
+            sCachedBackgroundImages[index] = new BitmapDrawable(context.getResources(), bmp);
+            return sCachedBackgroundImages[index];
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static File getCustomBackgroundFile(final Context context, final boolean night, final boolean landscape) {
+        return new File(DeviceProtectedUtils.getFilesDir(context),
+                "custom_background_image" + (landscape ? "_landscape" : "") + (night ? "_night" : ""));
+    }
+
+    public static void clearCachedBackgroundImages() {
+        Arrays.fill(sCachedBackgroundImages, null);
+    }
+
+    public static Context getDayNightContext(final Context context, final boolean wantNight) {
+        final boolean isNight = ResourceUtils.isNight(context.getResources());
+        if (isNight == wantNight)
+            return context;
+        final Configuration config = new Configuration(context.getResources().getConfiguration());
+        final int night = config.uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        final int uiModeWithNightBitsZero = config.uiMode - night;
+        config.uiMode = uiModeWithNightBitsZero
+                + (wantNight ? Configuration.UI_MODE_NIGHT_YES : Configuration.UI_MODE_NIGHT_NO);
+        final ContextThemeWrapper wrapper = new ContextThemeWrapper(context, R.style.platformActivityTheme);
+        wrapper.applyOverrideConfiguration(config);
+        return wrapper;
+    }
+
+    public boolean isTablet() {
+        return mContext.getResources().getInteger(R.integer.config_screen_metrics) >= 3;
+    }
+
+    @SuppressLint("DiscouragedApi")
+    public int getStringResIdByName(final String name) {
+        return mContext.getResources().getIdentifier(name, "string", mContext.getPackageName());
+    }
+
+    public String getInLocale(@StringRes final int resId, final Locale locale) {
+        return RunInLocaleKt.runInLocale(mContext, locale, (ctx) -> ctx.getString(resId));
+    }
+
+    public String readCustomCurrencyKey() {
+        return mPrefs.getString(PREF_CUSTOM_CURRENCY_KEY, Defaults.PREF_CUSTOM_CURRENCY_KEY);
+    }
+
+    public Integer getCustomToolbarKeyCode(ToolbarKey key) {
+        return ToolbarUtilsKt.getCustomKeyCode(key, mPrefs);
+    }
+
+    public Integer getCustomToolbarLongpressCode(ToolbarKey key) {
+        return ToolbarUtilsKt.getCustomLongpressKeyCode(key, mPrefs);
+    }
+
+    public static File getCustomFontFile(final Context context) {
+        return new File(DeviceProtectedUtils.getFilesDir(context), "custom_font");
+    }
+
+    public static File getCustomEmojiFontFile(final Context context) {
+        return new File(DeviceProtectedUtils.getFilesDir(context), "custom_emoji_font");
+    }
+
+    // "default" layout as in this is used if nothing else is specified in the
+    // subtype
+    public static String readDefaultLayoutName(final LayoutType type, final SharedPreferences prefs) {
+        return prefs.getString(PREF_LAYOUT_PREFIX + type.name(), Defaults.INSTANCE.getDefault(type));
+    }
+
+    public static void writeDefaultLayoutName(@Nullable final String name, final LayoutType type,
+            final SharedPreferences prefs) {
+        if (name == null)
+            prefs.edit().remove(PREF_LAYOUT_PREFIX + type.name()).apply();
+        else
+            prefs.edit().putString(PREF_LAYOUT_PREFIX + type.name(), name).apply();
+    }
+
+    public void saveSubtypeForApp(RichInputMethodSubtype subtype, String packageName) {
+        if (isSubtypePerApp() && !StringUtils.isEmpty(packageName)) {
+            mPrefs.edit().putString(PREF_SAVED_APP_SUBTYPE_PREFIX + packageName,
+                    SettingsSubtype.Companion.toSettingsSubtype(subtype.getRawSubtype()).toPref()).apply();
+        }
+    }
+
+    public RichInputMethodSubtype getSubtypeForApp(String packageName) {
+        if (!isSubtypePerApp() || StringUtils.isEmpty(packageName))
+            return null;
+        var subtypePref = mPrefs.getString(PREF_SAVED_APP_SUBTYPE_PREFIX + packageName, null);
+        if (subtypePref == null)
+            return null;
+        var settingsSubtype = SettingsSubtype.Companion.toSettingsSubtype(subtypePref);
+        var subtype = settingsSubtype.toEnabledSubtype();
+        if (subtype == null)
+            subtype = RichInputMethodManager.getInstance().findSubtypeForHintLocale(settingsSubtype.getLocale());
+        return subtype != null ? RichInputMethodSubtype.Companion.get(subtype) : null;
+    }
+
+    private boolean isSubtypePerApp() {
+        return mPrefs.getBoolean(PREF_SAVE_SUBTYPE_PER_APP, Defaults.PREF_SAVE_SUBTYPE_PER_APP);
+    }
+
+    public static PunctuationSuggestions readPunctuationSuggestions(Context context) {
+        SharedPreferences prefs = KtxKt.prefs(context);
+        String[] suggestPuncsSpec = prefs.contains(PREF_PUNCTUATION_SUGGESTIONS)
+                ? prefs.getString(PREF_PUNCTUATION_SUGGESTIONS, "").split("\\s+")
+                : PopupKeySpec.splitKeySpecs(context.getString(R.string.suggested_punctuations));
+        return PunctuationSuggestions.newPunctuationSuggestions(suggestPuncsSpec);
+    }
+}

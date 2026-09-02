@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Resource names in these families are resolved from user-selectable keyboard layouts and
+  toolbar/theme enums at runtime. TextKeyData resolves label_* by name, and ToolbarKey is
+  converted to the four explicit title resources below. Keep only these proven dynamic resources;
+  all other release resources remain eligible for normal shrinker analysis.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/label_*,@string/layout_*,@string/popup_keys_*,@string/theme_name_*,@string/style_name_*,@string/toolbar_mode_*,@string/ai_tools,@string/gifs,@string/resize,@string/stickers" />

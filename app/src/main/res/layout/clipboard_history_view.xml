@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    SPDX-License-Identifier: GPL-3.0-only
+-->
+<helium314.keyboard.keyboard.clipboard.ClipboardHistoryView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:visibility="gone"
+    android:background="@android:color/transparent"
+    android:paddingTop="6dp"
+    style="?attr/clipboardHistoryViewStyle">
+
+    <LinearLayout
+        android:id="@+id/clipboard_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp">
+
+        <ImageButton
+            android:id="@+id/clipboard_back_button"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:contentDescription="@string/content_description_back"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:id="@+id/clipboard_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/clipboard"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/clipboard_clear_button"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:contentDescription="@string/clear_clipboard" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/clipboard_empty_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            android:text="@string/clipboard_empty_emoticon" />
+
+        <helium314.keyboard.keyboard.clipboard.ClipboardHistoryRecyclerView
+            android:id="@+id/clipboard_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
+
+    </FrameLayout>
+
+    <helium314.keyboard.keyboard.MainKeyboardView
+        android:id="@+id/clipboard_bottom_row_keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</helium314.keyboard.keyboard.clipboard.ClipboardHistoryView>

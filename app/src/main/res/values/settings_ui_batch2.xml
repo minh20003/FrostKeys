@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Retained non-Vietnamese locales intentionally use the verified English fallback. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Main settings screen -->
+    <string name="settings_group_general">General</string>
+    <string name="settings_group_typing_input">Typing &amp; input</string>
+    <string name="settings_group_more">More</string>
+    <string name="settings_main_preferences_summary">Keypress sound, vibration, and general behavior</string>
+    <string name="settings_main_appearance_summary">Theme, keyboard height, and visual styles</string>
+    <string name="settings_main_toolbar_summary">Customize the toolbar layout and pinned buttons</string>
+    <string name="settings_main_cloud_summary">Gemini assistant, smart tools, and GIF searches</string>
+    <string name="settings_main_gesture_summary">Swipe typing, trail colors, and gesture actions</string>
+    <string name="settings_main_gesture_data_summary">Manage data collection for gestures</string>
+    <string name="settings_main_correction_summary">Autocorrect, block offensive words, and spacing</string>
+    <string name="settings_main_layouts_summary">Number row, symbols, and alternative characters</string>
+    <string name="settings_main_dictionary_summary">Word suggestions, emoji prediction, and personal dictionary</string>
+    <string name="settings_main_advanced_summary">Debug settings, clipboard, and experimental features</string>
+    <string name="settings_main_about_summary">App version, licenses, and privacy policy</string>
+    <string name="quick_setup_complete_title">Setup is complete!</string>
+    <string name="quick_setup_complete_summary">All essential settings have been successfully configured.</string>
+
+    <!-- Welcome wizard -->
+    <string name="welcome_wizard_start_action">Get started</string>
+    <string name="welcome_wizard_configure_keyboard">Configure keyboard</string>
+    <string name="welcome_wizard_enable_and_switch_toast">Please enable and switch to FrostKeys.</string>
+    <string name="welcome_wizard_welcome_to">Welcome to</string>
+    <string name="welcome_wizard_app_name">FrostKeys</string>
+    <string name="welcome_wizard_lets_get_you">Let\'s get you</string>
+    <string name="welcome_wizard_started">started</string>
+    <string name="welcome_wizard_enable_title">Enable FrostKeys</string>
+    <string name="welcome_wizard_enable_summary">Check “FrostKeys” in your language &amp; input settings.</string>
+    <string name="welcome_wizard_enable_first_toast">Please enable FrostKeys first.</string>
+    <string name="welcome_wizard_switch_title">Switch to FrostKeys</string>
+    <string name="welcome_wizard_switch_summary">Select “FrostKeys” as your active text-input method.</string>
+    <string name="welcome_wizard_switch_first_toast">Please switch to FrostKeys first.</string>
+    <string name="welcome_wizard_essential_title">Vietnamese typing and privacy</string>
+    <string name="welcome_wizard_essential_summary">Telex is ready by default; every optional feature remains under your control.</string>
+    <string name="welcome_wizard_vietnamese_input_title">Vietnamese Telex and VNI</string>
+    <string name="welcome_wizard_vietnamese_input_summary">Telex is selected by default. You can enable VNI with a number row or direct input later.</string>
+    <string name="welcome_wizard_privacy_title">Privacy comes first</string>
+    <string name="welcome_wizard_privacy_summary">Typing and learning data stay on this device. Contacts and screenshot clipboard stay off until you choose them and grant permission.</string>
+    <string name="welcome_wizard_cloud_title">Cloud features (optional)</string>
+    <string name="welcome_wizard_cloud_summary_off">Off by default: no cloud request is made. Enable only if you want AI or GIF search with your own API key.</string>
+    <string name="welcome_wizard_cloud_summary_on">Enabled. Add your API key later in Settings &gt; Cloud; turn this off at any time to cancel cloud requests.</string>
+
+    <!-- Search, crash-report and Telegram dialogs -->
+    <string name="search_settings_placeholder">Search settings</string>
+    <string name="settings_navigation_back">Back</string>
+    <string name="settings_more_options">More options</string>
+    <string name="crash_reports_action_ignore">Ignore</string>
+    <string name="crash_reports_action_get">Get</string>
+    <string name="crash_reports_found">Crash report files found</string>
+    <string name="telegram_logo_content_description">Telegram logo</string>
+    <string name="telegram_invite_title">Join our Telegram channel</string>
+    <string name="telegram_invite_summary">Get announcements, sneak peeks, and share ideas. Tap here to join.</string>
+    <string name="telegram_popup_title">Stay connected</string>
+    <string name="telegram_popup_message">Join my Telegram channel for update announcements, early previews, and a place to share feedback and ideas. Be part of the active development journey.</string>
+    <string name="telegram_maybe_later">Maybe later</string>
+    <string name="telegram_join_now">Join now</string>
+
+    <!-- AI writing panel XML -->
+    <string name="ai_action_back">Back</string>
+    <string name="ai_action_copy">Copy</string>
+    <string name="ai_writing_tools_title">AI writing tools</string>
+</resources>

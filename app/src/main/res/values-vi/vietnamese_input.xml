@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <string name="subtype_vietnamese_telex">%s (Telex)</string>
+    <string name="subtype_vietnamese_vni">%s (VNI)</string>
+    <string name="subtype_vietnamese_raw">%s (QWERTY trực tiếp)</string>
+    <string name="vietnamese_tone_placement_title">Cách đặt dấu tiếng Việt</string>
+    <string name="vietnamese_tone_placement_summary">Chọn cách đặt dấu trong “hòa” và “thúy”.</string>
+    <string name="vietnamese_tone_placement_common">Phổ biến — hòa, thúy</string>
+    <string name="vietnamese_tone_placement_alternate">Thay thế — hoà, thuý</string>
+    <string name="vietnamese_vni_number_row_note">VNI tự bật hàng số để dùng phím 1–0.</string>
+    <string name="sync_enabled_languages_with_os_switcher">Đồng bộ ngôn ngữ đã bật với bộ chuyển của hệ thống</string>
+</resources>

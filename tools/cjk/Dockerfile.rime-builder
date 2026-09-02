@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# The local Mozc builder is the only image in this workspace that has already downloaded and
+# SHA-256-verified the exact NDK r28 Linux archive. This local tag is intentional: Docker cannot
+# resolve an un-pushed local image by digest. build-rime-arm64.sh independently verifies the NDK
+# archive against tools/cjk/toolchains.json before compiling anything.
+FROM frostkeys-mozc-builder:ndk28-bazel9
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends cmake ninja-build xz-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY build-rime-arm64.sh /usr/local/bin/build-rime-arm64.sh
+COPY cjk_source_lock.py engine-sources.json toolchains.json verify-toolchain.py prepare-boost-headers.py verify-rime-opencc-data.py /opt/frostkeys/cjk/
+COPY rime-support/CMakeLists.txt /opt/frostkeys/cjk/rime-support/CMakeLists.txt
+COPY rime_bridge/CMakeLists.txt rime_bridge/frostkeys_rime_jni.cc /opt/frostkeys/cjk/rime_bridge/
+
+RUN chmod 0755 /usr/local/bin/build-rime-arm64.sh
+
+ENV FROSTKEYS_CJK_TOOL_ROOT=/opt/frostkeys/cjk
+WORKDIR /workspace
+ENTRYPOINT ["/usr/local/bin/build-rime-arm64.sh"]

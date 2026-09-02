@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <string name="ime_smoke_test_title">Kiểm tra bàn phím nội bộ</string>
+    <string name="ime_smoke_test_description">Màn hình riêng của APK nội bộ để kiểm tra bộ gõ. Dữ liệu ở đây không được lưu.</string>
+    <string name="ime_smoke_select_telex">Dùng Telex</string>
+    <string name="ime_smoke_select_vni">Dùng VNI</string>
+    <string name="ime_smoke_text_label">Văn bản thường — Telex/VNI được phép</string>
+    <string name="ime_smoke_email_label">Email — Telex/VNI phải giữ nguyên phím</string>
+    <string name="ime_smoke_uri_label">Địa chỉ web — Telex/VNI phải giữ nguyên phím</string>
+    <string name="ime_smoke_password_label">Mật khẩu — Telex/VNI phải giữ nguyên phím</string>
+    <string name="ime_smoke_number_label">Số — Telex/VNI phải giữ nguyên phím</string>
+</resources>

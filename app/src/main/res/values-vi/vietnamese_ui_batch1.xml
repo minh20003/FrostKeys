@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <!-- Cloud, AI and Klipy -->
+    <string name="cloud_features">Tính năng đám mây và AI</string>
+    <string name="cloud_features_summary">Công tắc chính. Chỉ cho phép bàn phím kết nối Internet khi bạn chủ động dùng các tính năng như Công cụ AI hoặc tìm GIF.</string>
+    <string name="cloud_intro_desc">Bật các tính năng thông minh có kết nối Internet. Khóa API được lưu an toàn trên thiết bị và không bao giờ được chia sẻ.\n\nĐể tạo khóa API Gemini:\n1. Nhấn nút bên dưới để mở Google AI Studio (aistudio.google.com).\n2. Đăng nhập bằng tài khoản Google.\n3. Nhấn nút “Create API Key” (hoặc “Get API Key”) ở góc trên bên trái.\n4. Chọn “Create API Key in new project” hoặc một dự án hiện có.\n5. Chờ tạo khóa, rồi nhấn “Copy” (khóa bắt đầu bằng AIzaSy…).\n6. Dán khóa vừa sao chép vào trường Khóa API Gemini bên dưới.</string>
+    <string name="ai_tools">Công cụ AI</string>
+    <string name="ai_use_this">Dùng nội dung này</string>
+    <string name="ai_applied">Đã áp dụng</string>
+    <string name="gemini_api_key">Khóa API Gemini</string>
+    <string name="gemini_api_key_summary">Nhập khóa API Google Gemini cá nhân của bạn.</string>
+    <string name="gemini_get_key_btn">Lấy khóa API Gemini 🔑</string>
+    <string name="klipy_api_key">Khóa API Klipy</string>
+    <string name="klipy_api_key_summary">Nhập khóa API Klipy cá nhân của bạn.</string>
+    <string name="klipy_get_key_btn">Lấy khóa API Klipy 🔑</string>
+    <string name="klipy_search_hint">Tìm trên Klipy</string>
+    <string name="klipy_clear_gif_history">Xóa toàn bộ lịch sử GIF</string>
+    <string name="klipy_clear_sticker_history">Xóa toàn bộ lịch sử nhãn dán</string>
+    <string name="klipy_clear_history_confirm_title_gif">Xóa toàn bộ lịch sử GIF?</string>
+    <string name="klipy_clear_history_confirm_title_sticker">Xóa toàn bộ lịch sử nhãn dán?</string>
+    <string name="klipy_clear_history_confirm_message">Thao tác này chỉ xóa các mục gần đây trong thẻ Klipy hiện tại.</string>
+    <string name="klipy_clear_history_confirm_action">Xóa</string>
+    <string name="klipy_section_pinned">Đã ghim</string>
+    <string name="klipy_section_history">Lịch sử</string>
+    <string name="klipy_action_pin">Ghim</string>
+    <string name="klipy_action_unpin">Bỏ ghim</string>
+    <string name="klipy_action_delete_from_history">Xóa khỏi lịch sử</string>
+    <string name="klipy_history_long_press_hint">Nhấn giữ một mục để ghim hoặc xóa</string>
+    <string name="klipy_powered_by">Cung cấp bởi Klipy</string>
+    <string name="send_gifs_as_stickers">Gửi GIF dưới dạng nhãn dán</string>
+    <string name="send_gifs_as_stickers_summary">Khi bật, kết quả trong thẻ GIF sẽ dùng quy trình nhãn dán động. Tắt để gửi GIF như ảnh GIF thông thường.</string>
+    <string name="gifs">GIF</string>
+    <string name="stickers">Nhãn dán</string>
+    <string name="tab_gifs">GIF</string>
+    <string name="tab_stickers">Nhãn dán</string>
+
+    <!-- Frosted Glass -->
+    <string name="theme_frosted_glass_settings_header">Cài đặt Kính mờ</string>
+    <string name="theme_name_dynamic">Màu động</string>
+    <string name="theme_name_frosted_glass">Kính mờ</string>
+    <string name="theme_name_holo_white">Holo trắng</string>
+    <string name="theme_name_user">Người dùng tùy chỉnh</string>
+    <string name="theme_name_violette">Tím violet</string>
+    <string name="button_adjust_frosted_glass">Điều chỉnh Kính mờ</string>
+    <string name="pref_frosted_blur_radius_title">Bán kính làm mờ nền</string>
+    <string name="pref_frosted_key_transparency_title">Độ trong suốt của phím</string>
+    <string name="pref_frosted_color_blend_title">Pha trộn màu hình nền</string>
+    <string name="pref_frosted_saturation_title">Tăng độ bão hòa màu</string>
+    <string name="pref_frosted_bg_transparency_title">Độ trong suốt của nền</string>
+    <string name="pref_frosted_special_vibrancy_title">Độ rực của phím đặc biệt</string>
+    <string name="pref_frosted_alphabet_vibrancy_title">Độ rực của phím chữ cái</string>
+    <string name="pref_frosted_dust_enabled_title">Hạt lấp lánh trên kính</string>
+    <string name="pref_frosted_dust_alpha_title">Cường độ lấp lánh</string>
+    <string name="frosted_glass_blur_unsupported_title">Thiết bị này không hỗ trợ làm mờ nền</string>
+    <string name="frosted_glass_blur_unsupported_message">%1$s không hỗ trợ hiệu ứng làm mờ nền trực tiếp cần cho bàn phím Kính mờ. Chủ đề sẽ dùng lớp màu trong suốt, dễ đọc thay thế.\n\nYêu cầu tối thiểu để làm mờ trực tiếp:\n- Android 12 trở lên có bật làm mờ cửa sổ hệ thống, hoặc Samsung Android 11 có hỗ trợ làm mờ cũ của Samsung.\n- GPU và firmware của nhà sản xuất cho phép cửa sổ ứng dụng hoặc IME bên thứ ba dùng tính năng làm mờ trực tiếp.\n- Trên Samsung Android 12 trở lên, cần hỗ trợ làm mờ cửa sổ trực tiếp SemBlurInfo. Làm mờ bảng bên từ ảnh chụp cần quyền hệ thống đặc biệt nên bàn phím bên thứ ba không thể dùng.\n\nMáy Samsung giá rẻ hoặc tầm trung đời cũ có thể cung cấp API nhưng vẫn từ chối làm mờ cửa sổ trực tiếp khi chạy.</string>
+    <string name="frosted_glass_test_input_title">Thử cài đặt bàn phím tại đây</string>
+    <string name="pref_blur_render_override_title">Ghi đè cách hiển thị làm mờ</string>
+    <string name="pref_blur_render_override_summary">Tự chọn cách hiển thị làm mờ Kính mờ hoặc buộc dùng màu nền đặc dự phòng.</string>
+    <string name="blur_render_override_auto_entry">Tự động (mặc định)</string>
+    <string name="blur_render_override_force_native_entry">Buộc làm mờ Android gốc</string>
+    <string name="blur_render_override_force_solid_entry">Buộc nền đặc dự phòng</string>
+
+    <!-- Setup and primary settings -->
+    <string name="quick_setup_title">Thiết lập nhanh FrostKeys</string>
+    <string name="quick_setup_desc">Thiết lập những mục thiết yếu sau để dùng đầy đủ FrostKeys:</string>
+    <string name="quick_setup_gesture_title">1. Thiết lập nhập vuốt (cử chỉ)</string>
+    <string name="quick_setup_gesture_desc">Nhập thư viện cử chỉ phù hợp với kiến trúc CPU của bạn</string>
+    <string name="quick_setup_dict_title">2. Thêm từ điển ngoại tuyến</string>
+    <string name="quick_setup_dict_desc">Tải xuống từ điển gợi ý từ và emoji</string>
+    <string name="quick_setup_cloud_title">3. Cấu hình khóa Gemini và Klipy</string>
+    <string name="quick_setup_cloud_desc">Lấy khóa API cá nhân cho công cụ thông minh và tìm GIF</string>
+    <string name="settings_screen_setup_wizard">Trình hướng dẫn thiết lập</string>
+    <string name="settings_screen_setup_wizard_summary">Chạy lại các màn hình thiết lập ban đầu</string>
+    <string name="settings_screen_appearance">Giao diện</string>
+    <string name="settings_screen_secondary_layouts">Bố cục phụ</string>
+    <string name="settings_category_input">Nhập liệu</string>
+    <string name="settings_category_clipboard_history">Lịch sử bảng nhớ tạm</string>
+    <string name="settings_category_miscellaneous">Khác</string>
+    <string name="action_none">Không có</string>
+    <string name="cancel">Hủy</string>
+    <string name="search_field_placeholder">Tìm kiếm</string>
+    <string name="emoji">Emoji</string>
+    <string name="clipboard">Bảng nhớ tạm</string>
+    <string name="clear_clipboard">Xóa bảng nhớ tạm</string>
+    <string name="enable_clipboard_history">Bật lịch sử bảng nhớ tạm</string>
+    <string name="enable_clipboard_history_summary">Nếu tắt, phím bảng nhớ tạm sẽ dán nội dung hiện có nếu có.</string>
+    <string name="no_recent_items">Không có mục gần đây</string>
+    <string name="no_results_found">Không tìm thấy kết quả</string>
+    <string name="privacy_policy">Chính sách quyền riêng tư</string>
+    <string name="privacy_policy_summary">Đọc chính sách quyền riêng tư trực tuyến</string>
+    <string name="language_switch_key_behavior">Hành vi của phím chuyển ngôn ngữ</string>
+    <string name="language_switch_key_switch_both">Chuyển cả hai</string>
+    <string name="theme_navbar">Tô màu thanh điều hướng</string>
+    <string name="theme_style">Kiểu phím</string>
+    <string name="day_night_mode_summary">Giao diện sẽ theo cài đặt hệ thống</string>
+    <string name="day_or_night_image">Đặt ảnh cho chế độ ban ngày hay ban đêm?</string>
+    <string name="all_colors_warning">Tùy chọn này hiển thị mọi màu được dùng nội bộ. Danh sách màu có thể thay đổi bất cứ lúc nào. Giá trị mặc định lấy từ màu thông thường và tên màu sẽ không được dịch.</string>
+</resources>

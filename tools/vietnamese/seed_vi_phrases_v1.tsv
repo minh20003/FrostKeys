@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# FrostKeys Vietnamese phrase seed v1.
+#
+# This is a small, original, manually curated seed authored for this personal fork. It is not a
+# corpus extract and intentionally contains no copied Leipzig, Wikipedia, Wiktionary, user, or
+# contact text. A future larger model must add a separately pinned snapshot, checksum, licence,
+# and attribution; do not silently replace this seed with scraped data.
+#
+# Format: order<TAB>score<TAB>context word(s)<TAB>candidate
+# order 2 = bigram, order 3 = trigram. Scores are relative only and must be 1..1000.
+2	1000	học	sinh
+2	995	công	nghệ
+2	990	Việt	Nam
+2	980	thông	tin
+2	975	trí	tuệ
+2	970	nhân	tạo
+2	965	đại	học
+2	960	sinh	viên
+2	955	giáo	dục
+2	950	sức	khỏe
+2	945	kinh	tế
+2	940	xã	hội
+2	935	gia	đình
+2	930	thời	gian
+2	925	cảm	ơn
+2	920	xin	chào
+2	915	chúc	mừng
+2	910	bạn	bè
+2	905	điện	thoại
+2	900	máy	tính
+2	895	phần	mềm
+2	890	ứng	dụng
+2	885	bảo	mật
+2	880	dữ	liệu
+2	875	thành	phố
+2	870	người	dùng
+2	865	hôm	nay
+2	860	ngày	mai
+2	855	việc	làm
+2	850	phát	triển
+2	845	quản	lý
+2	840	chất	lượng
+2	835	môi	trường
+2	830	giao	thông
+3	1000	học	sinh	giỏi
+3	995	công	nghệ	thông
+3	990	Việt	Nam	là
+3	985	thông	tin	cá
+3	980	trí	tuệ	nhân
+3	975	nhân	tạo	đang
+3	970	đại	học	quốc
+3	965	sinh	viên	mới
+3	960	giáo	dục	và
+3	955	sức	khỏe	cộng
+3	950	kinh	tế	xã
+3	945	xã	hội	hiện
+3	940	gia	đình	hạnh
+3	935	cảm	ơn	bạn
+3	930	xin	chào	bạn
+3	925	chúc	mừng	bạn
+3	920	điện	thoại	thông
+3	915	máy	tính	bảng
+3	910	phần	mềm	mã
+3	905	ứng	dụng	di
+3	900	bảo	mật	thông
+3	895	dữ	liệu	cá
+3	890	thành	phố	lớn
+3	885	người	dùng	cuối
+3	880	hôm	nay	tôi
+3	875	ngày	mai	chúng
+3	870	việc	làm	mới
+3	865	phát	triển	bền
+3	860	quản	lý	chất
+3	855	chất	lượng	cao
+3	850	môi	trường	sống
+3	845	giao	thông	công

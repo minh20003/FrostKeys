@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# Hermetic Linux builder for the pinned FrostKeys Mozc artifact.  The source checkout and
+# output directory are intentionally bind-mounted at runtime: this image never copies an
+# unverified checkout into an APK build context.
+FROM ubuntu:24.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG NDK_URL=https://dl.google.com/android/repository/android-ndk-r28-linux.zip
+ARG NDK_SHA256=a186b67e8810cb949514925e4f7a2255548fb55f5e9b0824a6430d012c1b695b
+ARG BAZEL_URL=https://github.com/bazelbuild/bazel/releases/download/9.0.2/bazel-9.0.2-linux-x86_64
+ARG BAZEL_SHA256=422e7a1690b76d7e615c29091d3aca28d0bd3a93fe3c93cbefb8f72d774926d5
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl git python3 unzip build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/frostkeys/toolchain \
+    && curl --fail --location --retry 3 --output /opt/frostkeys/toolchain/android-ndk-r28-linux.zip "$NDK_URL" \
+    && echo "$NDK_SHA256  /opt/frostkeys/toolchain/android-ndk-r28-linux.zip" | sha256sum --check \
+    && unzip -q /opt/frostkeys/toolchain/android-ndk-r28-linux.zip -d /opt/frostkeys/toolchain \
+    && test -d /opt/frostkeys/toolchain/android-ndk-r28 \
+    && curl --fail --location --retry 3 --output /opt/frostkeys/toolchain/bazel-9.0.2-linux-x86_64 "$BAZEL_URL" \
+    && echo "$BAZEL_SHA256  /opt/frostkeys/toolchain/bazel-9.0.2-linux-x86_64" | sha256sum --check \
+    && chmod 0755 /opt/frostkeys/toolchain/bazel-9.0.2-linux-x86_64
+
+WORKDIR /workspace

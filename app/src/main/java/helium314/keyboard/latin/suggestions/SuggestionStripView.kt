@@ -1,0 +1,1401 @@
+/*
+ * Copyright (C) 2011 The Android Open Source Project
+ * modified
+ * SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
+ */
+package helium314.keyboard.latin.suggestions
+
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.Context
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.content.res.ColorStateList
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PixelFormat
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.InsetDrawable
+import android.text.TextUtils
+import android.util.AttributeSet
+import android.util.TypedValue
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.DragEvent
+import android.view.View.DragShadowBuilder
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnLongClickListener
+import android.view.ViewGroup
+import android.view.accessibility.AccessibilityEvent
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.isVisible
+import helium314.keyboard.event.HapticEvent
+import helium314.keyboard.keyboard.KeyboardSwitcher
+import helium314.keyboard.keyboard.KeyboardTheme
+import helium314.keyboard.keyboard.KeyboardTypeface
+import helium314.keyboard.keyboard.internal.KeyboardIconsSet
+import helium314.keyboard.keyboard.internal.keyboard_parser.floris.KeyCode
+import helium314.keyboard.latin.AudioAndHapticFeedbackManager
+import helium314.keyboard.latin.dictionary.Dictionary
+import helium314.keyboard.latin.R
+import helium314.keyboard.latin.SuggestedWords
+import helium314.keyboard.latin.SuggestedWords.SuggestedWordInfo
+import helium314.keyboard.latin.common.ColorType
+import helium314.keyboard.latin.common.Colors
+import helium314.keyboard.latin.common.Constants
+import helium314.keyboard.latin.common.KeyBackgroundUtils
+import helium314.keyboard.latin.define.DebugFlags
+import helium314.keyboard.latin.settings.DebugSettings
+import helium314.keyboard.latin.settings.Defaults
+import helium314.keyboard.latin.settings.Settings
+import helium314.keyboard.latin.utils.Log
+import helium314.keyboard.latin.utils.ResourceUtils
+import helium314.keyboard.latin.utils.MAX_PINNED_TOOLBAR_KEYS
+import helium314.keyboard.latin.utils.TOOLBAR_DRAG_CLIP_LABEL
+import helium314.keyboard.latin.utils.ToolbarDragSource
+import helium314.keyboard.latin.utils.ToolbarDragState
+import helium314.keyboard.latin.utils.ToolbarKey
+import helium314.keyboard.latin.utils.ToolbarMode
+import helium314.keyboard.latin.utils.createToolbarKey
+import helium314.keyboard.latin.utils.dpToPx
+import helium314.keyboard.latin.utils.getCodeForToolbarKey
+import helium314.keyboard.latin.utils.getCodeForToolbarKeyLongClick
+import helium314.keyboard.latin.utils.getPinnedToolbarKeys
+import helium314.keyboard.latin.utils.getStringResourceOrName
+import helium314.keyboard.latin.utils.getToolbarKeyFromDragData
+import helium314.keyboard.latin.utils.pinToolbarKeyAt
+import helium314.keyboard.latin.utils.prefs
+import helium314.keyboard.latin.utils.removeFirst
+import helium314.keyboard.latin.utils.setToolbarButtonsActivatedStateOnPrefChange
+import helium314.keyboard.latin.utils.startDragAndDropCompat
+import helium314.keyboard.latin.utils.updateToolbarButtonActivatedState
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.abs
+import kotlin.math.min
+import androidx.core.view.isGone
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.background
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import java.util.Locale
+
+@SuppressLint("InflateParams")
+class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int) :
+    RelativeLayout(context, attrs, defStyle), View.OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener {
+
+    /** Construct a [SuggestionStripView] for showing suggestions to be picked by the user. */
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.attr.suggestionStripViewStyle)
+
+    interface Listener {
+        fun pickSuggestionManually(word: SuggestedWordInfo?)
+        fun onCodeInput(primaryCode: Int, x: Int, y: Int, isKeyRepeat: Boolean)
+        fun removeSuggestion(word: String?)
+        fun removeExternalSuggestions()
+        fun onSwipeDownOnToolbar()
+    }
+
+    private val moreSuggestionsContainer: View
+    private val wordViews = ArrayList<TextView>()
+    private val debugInfoViews = ArrayList<TextView>()
+    private val dividerViews = ArrayList<View>()
+
+    init {
+        val inflater = LayoutInflater.from(context)
+        inflater.inflate(R.layout.suggestions_strip, this)
+        moreSuggestionsContainer = inflater.inflate(R.layout.more_suggestions, null)
+
+        val colors = Settings.getValues().mColors
+        colors.setBackground(this, ColorType.STRIP_BACKGROUND)
+        repeat(SuggestedWords.MAX_SUGGESTIONS) {
+            val word = TextView(context, null, R.attr.suggestionWordStyle)
+            word.contentDescription = resources.getString(R.string.spoken_empty_suggestion)
+            word.setOnClickListener(this)
+            word.setOnLongClickListener(this)
+            KeyboardTypeface.applyToTextView(word)
+            colors.setBackground(word, ColorType.STRIP_BACKGROUND)
+            wordViews.add(word)
+            val divider = inflater.inflate(R.layout.suggestion_divider, null)
+            dividerViews.add(divider)
+            val info = TextView(context, null, R.attr.suggestionWordStyle)
+            info.setTextColor(colors.get(ColorType.KEY_TEXT))
+            info.setTextSize(TypedValue.COMPLEX_UNIT_DIP, DEBUG_INFO_TEXT_SIZE_IN_DIP)
+            KeyboardTypeface.applyToTextView(info)
+            debugInfoViews.add(info)
+        }
+
+        DEBUG_SUGGESTIONS = context.prefs().getBoolean(DebugSettings.PREF_SHOW_SUGGESTION_INFOS, Defaults.PREF_SHOW_SUGGESTION_INFOS)
+    }
+
+    // toolbar views, drawables and setup
+    private val toolbar: ViewGroup = findViewById(R.id.toolbar)
+    private val toolbarContainer: View = findViewById(R.id.toolbar_container)
+    private val suggestionsMiddleContainer: ViewGroup = findViewById(R.id.suggestions_middle_container)
+    private val pinnedKeys: ComposeView = findViewById(R.id.pinned_keys_container)
+    private val suggestionsStrip: ViewGroup = findViewById(R.id.suggestions_strip)
+    private val persistentToolbarKey: ImageButton = findViewById(R.id.persistent_toolbar_key)
+
+    private var composeLifecycleOwner: ComposeLifecycleOwner? = null
+    private val slotsState = mutableStateOf<List<Any>>(emptyList())
+    private val colorsState = mutableStateOf<Colors?>(null)
+    private val activatedStateVersion = mutableIntStateOf(0)
+    private val draggingKeyInComposeState = mutableStateOf<ToolbarKey?>(null)
+
+    private data class PinnedSlotBounds(val tag: Any, val left: Float, val right: Float)
+    private val pinnedSlotBounds = HashMap<Int, PinnedSlotBounds>()
+    private val accessPointTriggerBtn: ImageButton = findViewById(R.id.access_point_trigger_btn)
+    private val toolbarExpandKey: ImageButton? = null
+    private val incognitoIcon = KeyboardIconsSet.instance.getNewDrawable(ToolbarKey.INCOGNITO.name, context)
+    private val toolbarArrowIcon = KeyboardIconsSet.instance.getNewDrawable(KeyboardIconsSet.NAME_TOOLBAR_KEY, context)
+    private val enabledToolKeyBackground = GradientDrawable()
+    private var direction = 1 // 1 if LTR, -1 if RTL
+    private val suggestionsChipScroll: View = findViewById(R.id.suggestions_chip_scroll)
+    private val suggestionsChipStrip: ViewGroup = findViewById(R.id.suggestions_chip_strip)
+
+    private val toolbarKeyLayoutParams = LinearLayout.LayoutParams(
+        resources.getDimensionPixelSize(R.dimen.config_suggestions_strip_edge_key_width),
+        LinearLayout.LayoutParams.MATCH_PARENT
+    )
+
+    private var suggestedWords = SuggestedWords.getEmptyInstance()
+    private var isExternalSuggestionVisible = false // Required to disable the more suggestions if other suggestions are visible
+    // A CJK conversion bar is an active part of text entry rather than an optional prediction
+    // feature. It may therefore stay visible even when the user hides the normal toolbar.
+    // Generic clipboard/autofill external rows always keep this false.
+    private var forceExternalSuggestionVisible = false
+    private var isPinnedToolbarDragActive = false
+    private var isAccessPointMenuOpen = false
+    private var pinnedDropPreviewKey: ToolbarKey? = null
+    private var pinnedDropPreviewSource: ToolbarDragSource? = null
+    private var pinnedDropPreviewRequestedIndex = -1
+    private var pinnedDropPreviewIndex = -1
+    private val dragTargetScreenLocation = IntArray(2)
+    private val pinnedScreenLocation = IntArray(2)
+    private val pinnedSlotViewScratch = ArrayList<View>(MAX_PINNED_TOOLBAR_KEYS)
+    private var lastPinnedKeysWidth = 0
+
+    init {
+        val colors = Settings.getValues().mColors
+
+        // expand key
+        toolbarExpandKey?.let {
+            val toolbarHeight = min(it.layoutParams.height, resources.getDimension(R.dimen.config_suggestions_strip_height).toInt())
+            it.layoutParams.height = toolbarHeight
+            it.layoutParams.width = toolbarHeight // we want it square
+            colors.setBackground(it, ColorType.STRIP_BACKGROUND) // necessary because background is re-used for defaultToolbarBackground
+            colors.setColor(it, ColorType.TOOL_BAR_EXPAND_KEY)
+            colors.setColor(it.background, ColorType.TOOL_BAR_EXPAND_KEY_BACKGROUND)
+            it.isVisible = false
+        }
+
+        // background indicator for pinned keys
+        val color = colors.get(ColorType.TOOL_BAR_KEY_ENABLED_BACKGROUND) or -0x1000000 // ignore alpha (in Java this is more readable 0xFF000000)
+        enabledToolKeyBackground.colors = intArrayOf(color, Color.TRANSPARENT)
+        enabledToolKeyBackground.gradientType = GradientDrawable.RADIAL_GRADIENT
+        enabledToolKeyBackground.gradientRadius = resources.getDimensionPixelSize(R.dimen.config_suggestions_strip_height) / 2.1f
+
+        // toolbar keys setup
+        findViewById<ImageButton>(R.id.access_point_trigger_btn)?.let {
+            setupKey(it, colors)
+            applyAlphabetIconTint(it, colors)
+            applySpecialKeyCircleBackground(it, colors)
+        }
+        val pinnedDropListener = View.OnDragListener { target, event -> onPinnedToolbarDrag(target, event) }
+        suggestionsMiddleContainer.setOnDragListener(pinnedDropListener)
+        suggestionsStrip.setOnDragListener(pinnedDropListener)
+        suggestionsChipScroll.setOnDragListener(pinnedDropListener)
+        pinnedKeys.setOnDragListener(pinnedDropListener)
+
+        setupComposePinnedKeys()
+        updateKeys()
+    }
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalFoundationApi::class)
+    private fun setupComposePinnedKeys() {
+        val owner = ComposeLifecycleOwner()
+        owner.start()
+        composeLifecycleOwner = owner
+        pinnedKeys.setViewTreeLifecycleOwner(owner)
+        pinnedKeys.setViewTreeSavedStateRegistryOwner(owner)
+        pinnedKeys.setViewTreeViewModelStoreOwner(owner)
+        pinnedKeys.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(owner))
+        pinnedKeys.setContent {
+            val slots by slotsState
+            val draggingKey by draggingKeyInComposeState
+            val keyboardColors = colorsState.value ?: Settings.getValues().mColors
+            val isNight = ResourceUtils.isNight(context.resources)
+            val version by activatedStateVersion
+
+            val primaryVal = ComposeColor(keyboardColors.get(ColorType.SPECIAL_KEY_BACKGROUND))
+            val onPrimaryVal = ComposeColor(keyboardColors.get(if (isNight) ColorType.ACTION_KEY_ICON else ColorType.KEY_TEXT))
+            val surfaceVal = ComposeColor(keyboardColors.get(ColorType.KEY_BACKGROUND))
+            val onSurfaceVal = ComposeColor(keyboardColors.get(ColorType.KEY_TEXT))
+
+            val themeStyle = keyboardColors.themeStyle
+            val isSquareStyle = themeStyle == KeyboardTheme.STYLE_MATERIAL || themeStyle == KeyboardTheme.STYLE_HOLO
+
+            val baseShape = when (themeStyle) {
+                KeyboardTheme.STYLE_HOLO -> RoundedCornerShape(0.dp)
+                KeyboardTheme.STYLE_MATERIAL -> RoundedCornerShape(8.dp)
+                else -> RoundedCornerShape(percent = 50)
+            }
+
+            val colorScheme = if (isNight) {
+                androidx.compose.material3.darkColorScheme(
+                    primary = primaryVal,
+                    onPrimary = onPrimaryVal,
+                    surface = surfaceVal,
+                    onSurface = onSurfaceVal,
+                    secondaryContainer = surfaceVal,
+                    onSecondaryContainer = onSurfaceVal,
+                    surfaceVariant = surfaceVal,
+                    onSurfaceVariant = onSurfaceVal,
+                    outline = ComposeColor.Transparent,
+                    outlineVariant = ComposeColor.Transparent
+                )
+            } else {
+                androidx.compose.material3.lightColorScheme(
+                    primary = primaryVal,
+                    onPrimary = onPrimaryVal,
+                    surface = surfaceVal,
+                    onSurface = onSurfaceVal,
+                    secondaryContainer = surfaceVal,
+                    onSecondaryContainer = onSurfaceVal,
+                    surfaceVariant = surfaceVal,
+                    onSurfaceVariant = onSurfaceVal,
+                    outline = ComposeColor.Transparent,
+                    outlineVariant = ComposeColor.Transparent
+                )
+            }
+
+            val customFontFamily = KeyboardTypeface.customFontFamily()
+
+            MaterialTheme(colorScheme = colorScheme) {
+                CompositionLocalProvider(
+                    LocalTextStyle provides LocalTextStyle.current.copy(
+                        fontFamily = customFontFamily,
+                        fontSize = 14.sp
+                    )
+                ) {
+                    val density = LocalDensity.current
+                    BoxWithConstraints(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (constraints.maxWidth > 0) {
+                            val availableWidthPx = constraints.maxWidth
+                            val widthDp = remember(slots.size, availableWidthPx) {
+                                with(density) { pinnedButtonWidth(slots.size, availableWidthPx).toDp() }
+                            }
+                            val totalGaps = if (slots.size > 1) slots.size - 1 else 0
+                            val minNeededWidth = (8.dp * totalGaps) + 8.dp
+
+                            if (maxWidth >= minNeededWidth) {
+                                ButtonGroup(
+                                    overflowIndicator = {},
+                                    expandedRatio = 0.25f,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp)
+                                        .layout { measurable, constraints ->
+                                            val relaxedConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+                                            val placeable = measurable.measure(relaxedConstraints)
+                                            layout(placeable.width, placeable.height) {
+                                                placeable.placeRelative(0, 0)
+                                            }
+                                        },
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                slots.forEachIndexed { index, slot ->
+                                    if (slot == ToolbarKey.VOICE && !Settings.getValues().mShowsVoiceInputKey) {
+                                        return@forEachIndexed
+                                    }
+                                    if (slot === PinnedDropPlaceholder) {
+                                        customItem(
+                                            buttonGroupContent = {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(width = widthDp, height = 34.dp)
+                                                        .background(
+                                                            color = surfaceVal.copy(alpha = 0.45f),
+                                                            shape = baseShape
+                                                        )
+                                                        .onGloballyPositioned { coordinates ->
+                                                            val bounds = coordinates.boundsInRoot()
+                                                            pinnedSlotBounds[index] = PinnedSlotBounds(slot, bounds.left, bounds.right)
+                                                        }
+                                                )
+                                            },
+                                            menuContent = {}
+                                        )
+                                    } else if (slot is ToolbarKey) {
+                                        val isSelected = isToolbarKeyActivated(slot)
+                                        val isDragging = draggingKey == slot
+                                        val resId = KeyboardIconsSet.instance.iconIds[slot.name.lowercase(Locale.US)]
+                                        val containerColor = if (isSelected) primaryVal else surfaceVal
+                                        val contentColor = if (isSelected) onPrimaryVal else onSurfaceVal
+
+                                        customItem(
+                                            buttonGroupContent = {
+                                                val interactionSource = remember { MutableInteractionSource() }
+                                                val isPressed by interactionSource.collectIsPressedAsState()
+
+                                                val buttonShape = if (isPressed) {
+                                                    when (themeStyle) {
+                                                        KeyboardTheme.STYLE_HOLO, KeyboardTheme.STYLE_MATERIAL -> RoundedCornerShape(4.dp)
+                                                        else -> RoundedCornerShape(8.dp)
+                                                    }
+                                                } else {
+                                                    baseShape
+                                                }
+
+                                                Box(
+                                                    contentAlignment = Alignment.Center,
+                                                    modifier = Modifier
+                                                        .size(width = widthDp, height = 34.dp)
+                                                        .background(color = containerColor, shape = buttonShape)
+                                                        .onGloballyPositioned { coordinates ->
+                                                            val bounds = coordinates.boundsInRoot()
+                                                            pinnedSlotBounds[index] = PinnedSlotBounds(slot, bounds.left, bounds.right)
+                                                        }
+                                                        .animateWidth(interactionSource)
+                                                        .graphicsLayer {
+                                                            alpha = if (isDragging) 0f else 1f
+                                                        }
+                                                        .combinedClickable(
+                                                            interactionSource = interactionSource,
+                                                            indication = LocalIndication.current,
+                                                            onClick = {
+                                                                AudioAndHapticFeedbackManager.getInstance().performHapticAndAudioFeedback(
+                                                                    KeyCode.NOT_SPECIFIED,
+                                                                    this@SuggestionStripView,
+                                                                    HapticEvent.KEY_PRESS
+                                                                )
+                                                                val code = getCodeForToolbarKey(slot)
+                                                                if (code != KeyCode.UNSPECIFIED) {
+                                                                    listener.onCodeInput(code, Constants.SUGGESTION_STRIP_COORDINATE, Constants.SUGGESTION_STRIP_COORDINATE, false)
+                                                                }
+                                                            },
+                                                            onLongClick = {
+                                                                AudioAndHapticFeedbackManager.getInstance().performHapticFeedback(
+                                                                    this@SuggestionStripView,
+                                                                    HapticEvent.KEY_LONG_PRESS
+                                                                )
+                                                                startPinnedToolbarDragFromCompose(slot)
+                                                            }
+                                                        )
+                                                ) {
+                                                    if (resId != null) {
+                                                        Icon(
+                                                            painter = painterResource(resId),
+                                                            contentDescription = slot.name,
+                                                            tint = contentColor,
+                                                            modifier = Modifier.size(20.dp)
+                                                        )
+                                                    }
+                                                }
+                                            },
+                                            menuContent = {}
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isToolbarKeyActivated(key: ToolbarKey): Boolean {
+        val prefs = context.prefs()
+        return when (key) {
+            ToolbarKey.INCOGNITO -> prefs.getBoolean(Settings.PREF_ALWAYS_INCOGNITO_MODE, Defaults.PREF_ALWAYS_INCOGNITO_MODE)
+            ToolbarKey.ONE_HANDED -> Settings.getValues().mOneHandedModeEnabled
+            ToolbarKey.SPLIT -> Settings.getValues().mIsSplitKeyboardEnabled
+            ToolbarKey.AUTOCORRECT -> Settings.getValues().mAutoCorrectionEnabledPerUserSettings
+            else -> true
+        }
+    }
+
+    private fun startPinnedToolbarDragFromCompose(key: ToolbarKey) {
+        draggingKeyInComposeState.value = key
+        isPinnedToolbarDragActive = true
+        val clipData = ClipData.newPlainText(TOOLBAR_DRAG_CLIP_LABEL, key.name)
+        val shadowBuilder = ButtonDragShadowBuilder(context, key)
+        pinnedKeys.startDragAndDropCompat(
+            clipData,
+            shadowBuilder,
+            ToolbarDragState(key, ToolbarDragSource.PINNED_ROW, pinnedKeys)
+        )
+    }
+
+    private lateinit var listener: Listener
+    private var startIndexOfMoreSuggestions = 0
+    private val layoutHelper = SuggestionStripLayoutHelper(context, attrs, defStyle, wordViews, dividerViews, debugInfoViews)
+    private val moreSuggestionsView = moreSuggestionsContainer.findViewById<MoreSuggestionsView>(R.id.more_suggestions_view).apply {
+        val slidingListener = object : SimpleOnGestureListener() {
+            override fun onScroll(down: MotionEvent?, me: MotionEvent, deltaX: Float, deltaY: Float): Boolean {
+                if (down == null) return false
+                val dy = me.y - down.y
+                val dx = me.x - down.x
+
+                if (Settings.getValues().mToolbarSwipeDownToHide && dy > 50.dpToPx(resources) && abs(dy) > abs(dx)) {
+                    listener.onSwipeDownOnToolbar()
+                    return true
+                }
+
+                return if (!isExternalSuggestionVisible && toolbarContainer.visibility != VISIBLE && deltaY > 0 && dy < (-10).dpToPx(resources)) showMoreSuggestions()
+                else false
+            }
+        }
+        gestureDetector = GestureDetector(context, slidingListener)
+    }
+
+    // public stuff
+
+    val isShowingMoreSuggestionPanel get() = moreSuggestionsView.isShowingInParent
+
+    /** A connection back to the input method. */
+    fun setListener(newListener: Listener, inputView: View) {
+        listener = newListener
+        moreSuggestionsView.listener = newListener
+        moreSuggestionsView.mainKeyboardView = inputView.findViewById(R.id.keyboard_view)
+    }
+
+    fun setRtl(isRtlLanguage: Boolean) {
+        val newLayoutDirection: Int
+        if (!Settings.getValues().mVarToolbarDirection)
+            newLayoutDirection = LAYOUT_DIRECTION_LOCALE
+        else {
+            newLayoutDirection = if (isRtlLanguage) LAYOUT_DIRECTION_RTL else LAYOUT_DIRECTION_LTR
+            direction = if (isRtlLanguage) -1 else 1
+            toolbarExpandKey?.scaleX = (if (toolbarContainer.visibility != VISIBLE) 1f else -1f) * direction
+        }
+        layoutDirection = newLayoutDirection
+        suggestionsStrip.layoutDirection = newLayoutDirection
+        suggestionsChipStrip.layoutDirection = newLayoutDirection
+        pinnedKeys.layoutDirection = newLayoutDirection
+    }
+
+    fun setToolbarVisibility(toolbarVisible: Boolean) {
+        toolbarContainer.isVisible = false
+        updateSuggestionContainersVisibility(true)
+
+        if (DEBUG_SUGGESTIONS) {
+            for (view in debugInfoViews) {
+                view.visibility = if (suggestionsStrip.isVisible) VISIBLE else GONE
+            }
+        }
+
+        toolbarExpandKey?.scaleX = direction.toFloat()
+        // Restore access point icon when returning to normal state
+        setAccessPointIcon(isMenuOpen = false)
+    }
+
+    fun showPinnedToolbarKeys() {
+        toolbarContainer.isVisible = false
+        populatePinnedKeys()
+        suggestionsStrip.isVisible = false
+        suggestionsChipScroll.isVisible = false
+        pinnedKeys.isVisible = slotsState.value.isNotEmpty()
+        // Swap access point icon to back arrow while menu is open
+        setAccessPointMenuOpen(true)
+    }
+
+    fun setAccessPointMenuOpen(isOpen: Boolean) {
+        setAccessPointIcon(isMenuOpen = isOpen)
+    }
+
+    fun setSuggestions(suggestions: SuggestedWords, isRtlLanguage: Boolean) {
+        isExternalSuggestionVisible = false
+        forceExternalSuggestionVisible = false
+        clear()
+        setRtl(isRtlLanguage)
+        suggestedWords = suggestions
+        updateSuggestionContainersVisibility(true)
+        startIndexOfMoreSuggestions =
+            if (!shouldShowSuggestionContent(suggestedWords)) {
+                suggestedWords.size()
+            } else if (shouldUseChipSuggestions(suggestedWords)) {
+                suggestionsChipScroll.scrollTo(0, 0)
+                layoutHelper.layoutChipsAndReturnStartIndexOfMoreSuggestions(
+                    context, suggestedWords, suggestionsChipStrip
+                )
+            } else {
+                layoutHelper.layoutAndReturnStartIndexOfMoreSuggestions(
+                    context, suggestedWords, suggestionsStrip, this
+                )
+            }
+        updateKeys()
+    }
+
+    fun setExternalSuggestionView(view: View?, addCloseButton: Boolean) {
+        setExternalSuggestionView(view, addCloseButton, forceVisible = false)
+    }
+
+    /**
+     * Displays an IME-owned composition row without treating it as a normal toolbar/prediction.
+     *
+     * This narrow path exists for engines such as Mozc. A Japanese conversion candidate must
+     * remain tappable even when users have hidden Latin predictions; callers still own teardown
+     * through [clearExternalSuggestionView].
+     */
+    fun setImeExternalSuggestionView(view: View?) {
+        setExternalSuggestionView(view, addCloseButton = false, forceVisible = true)
+    }
+
+    private fun setExternalSuggestionView(
+        view: View?,
+        addCloseButton: Boolean,
+        forceVisible: Boolean,
+    ) {
+        isExternalSuggestionVisible = true
+        forceExternalSuggestionVisible = forceVisible
+        clear()
+        updateSuggestionContainersVisibility(true)
+
+        if (addCloseButton) {
+            val wrapper = LinearLayout(context)
+            suggestionsStrip.doOnNextLayout {
+                wrapper.layoutParams = LinearLayout.LayoutParams(suggestionsStrip.width - 30.dpToPx(resources), LayoutParams.MATCH_PARENT)
+            }
+            wrapper.addView(view)
+            suggestionsStrip.addView(wrapper)
+
+            val closeButton = createToolbarKey(context, ToolbarKey.CLOSE_HISTORY)
+            closeButton.layoutParams = toolbarKeyLayoutParams
+            setupKey(closeButton, Settings.getValues().mColors)
+            closeButton.setOnClickListener {
+                listener.removeExternalSuggestions()
+            }
+            suggestionsStrip.addView(closeButton)
+        } else {
+            suggestionsStrip.addView(view)
+        }
+
+        if (Settings.getValues().mAutoHideToolbar) setToolbarVisibility(false)
+    }
+
+    /**
+     * Removes an IME-owned external strip without routing through [Listener].
+     *
+     * Mozc owns its composition lifecycle and must not resume Latin suggestions while its native
+     * result is still being committed. Generic external suggestions continue to use the listener
+     * close path above; this narrow method is only for a lifecycle owner that has already stopped
+     * its own session.
+     */
+    fun clearExternalSuggestionView() {
+        if (!isExternalSuggestionVisible) return
+        isExternalSuggestionVisible = false
+        forceExternalSuggestionVisible = false
+        clear()
+        updateSuggestionContainersVisibility(false)
+    }
+
+    fun setMoreSuggestionsHeight(remainingHeight: Int) {
+        layoutHelper.setMoreSuggestionsHeight(remainingHeight)
+    }
+
+    fun dismissMoreSuggestionsPanel() {
+        moreSuggestionsView.dismissPopupKeysPanel()
+    }
+
+    // overrides: necessarily public, but not used from outside
+
+    override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String?) {
+        activatedStateVersion.intValue++
+        setToolbarButtonsActivatedStateOnPrefChange(toolbar, key)
+        if (key == Settings.PREF_ALWAYS_INCOGNITO_MODE
+            || key == Settings.PREF_PINNED_TOOLBAR_KEYS
+            || key == Settings.PREF_PERSISTENT_TOOLBAR_KEY)
+            // This view owns the deferred update. A global coroutine could update a detached
+            // keyboard view after the IME was recreated.
+            postDelayed({
+                if (isAttachedToWindow) updateKeys()
+            }, 10L)
+    }
+
+    override fun onVisibilityChanged(view: View, visibility: Int) {
+        super.onVisibilityChanged(view, visibility)
+        // workaround for a bug with inline suggestions views that just keep showing up otherwise, https://github.com/HeliBorg/HeliBoard/pull/386
+        if (view === this)
+            updateSuggestionContainersVisibility(visibility == VISIBLE && !toolbarContainer.isVisible)
+    }
+
+    private fun getLatinIME(): helium314.keyboard.latin.LatinIME? {
+        var ctx = context
+        while (ctx is android.content.ContextWrapper) {
+            if (ctx is helium314.keyboard.latin.LatinIME) return ctx
+            ctx = ctx.baseContext
+        }
+        return ctx as? helium314.keyboard.latin.LatinIME
+    }
+
+    override fun onAttachedToWindow() {
+        val latinIME = getLatinIME()
+        if (latinIME != null) {
+            val root = rootView
+            if (root != null) {
+                root.setViewTreeLifecycleOwner(latinIME)
+                root.setViewTreeSavedStateRegistryOwner(latinIME)
+                root.setViewTreeViewModelStoreOwner(latinIME)
+            }
+            setViewTreeLifecycleOwner(latinIME)
+            setViewTreeSavedStateRegistryOwner(latinIME)
+            setViewTreeViewModelStoreOwner(latinIME)
+        }
+        super.onAttachedToWindow()
+        if (composeLifecycleOwner == null) {
+            setupComposePinnedKeys()
+        } else {
+            composeLifecycleOwner?.start()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        composeLifecycleOwner?.stop()
+        dismissMoreSuggestionsPanel()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        // Called by the framework when the size is known. Show the important notice if applicable.
+        // This may be overridden by showing suggestions later, if applicable.
+        pinnedKeys.post {
+            val width = pinnedKeys.width
+            if (width > 0 && width != lastPinnedKeysWidth && !isPinnedToolbarDragActive) {
+                lastPinnedKeysWidth = width
+                populatePinnedKeys()
+                updateSuggestionContainersVisibility(!toolbarContainer.isVisible)
+            }
+        }
+    }
+
+    override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent): Boolean {
+        // Don't populate accessibility event with suggested words and voice key.
+        return true
+    }
+
+    override fun onInterceptTouchEvent(motionEvent: MotionEvent): Boolean {
+        // Detecting sliding up finger to show MoreSuggestionsView.
+        return moreSuggestionsView.shouldInterceptTouchEvent(motionEvent)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(motionEvent: MotionEvent): Boolean {
+        moreSuggestionsView.touchEvent(motionEvent)
+        return true
+    }
+
+    override fun onClick(view: View) {
+        AudioAndHapticFeedbackManager.getInstance().performHapticAndAudioFeedback(KeyCode.NOT_SPECIFIED, this, HapticEvent.KEY_PRESS)
+        if (view.id == R.id.access_point_trigger_btn) {
+            KeyboardSwitcher.getInstance().onToggleKeyboard(KeyboardSwitcher.KeyboardSwitchState.ACCESS_POINT)
+            // Update icon based on resulting state (back arrow when menu is open, grid when closed)
+            val isMenuOpen = KeyboardSwitcher.getInstance().isShowingAccessPointMenu
+            setAccessPointIcon(isMenuOpen = isMenuOpen)
+            return
+        }
+        val tag = view.tag
+        if (tag is ToolbarKey) {
+            val code = getCodeForToolbarKey(tag)
+            if (code != KeyCode.UNSPECIFIED) {
+                Log.d(TAG, "click toolbar key $tag")
+                listener.onCodeInput(code, Constants.SUGGESTION_STRIP_COORDINATE, Constants.SUGGESTION_STRIP_COORDINATE, false)
+                return
+            }
+        }
+
+        // tag for word views is set in SuggestionStripLayoutHelper (setupWordViewsTextAndColor, layoutPunctuationSuggestions)
+        if (tag is Int) {
+            if (tag >= suggestedWords.size()) {
+                return
+            }
+            val wordInfo = suggestedWords.getInfo(tag)
+            listener.pickSuggestionManually(wordInfo)
+        }
+    }
+
+    override fun onLongClick(view: View): Boolean {
+        AudioAndHapticFeedbackManager.getInstance().performHapticFeedback(this, HapticEvent.KEY_LONG_PRESS)
+        if (view.tag is ToolbarKey) {
+            onLongClickToolbarKey(view)
+            return true
+        }
+        return if (view is TextView && wordViews.contains(view)) {
+            onLongClickSuggestion(view)
+        } else {
+            showMoreSuggestions()
+        }
+    }
+
+    // actually private stuff
+
+    private fun onLongClickToolbarKey(view: View) {
+        val tag = view.tag as? ToolbarKey ?: return
+        if (view.parent === pinnedKeys) {
+            startPinnedToolbarDrag(view, tag)
+            return
+        }
+        val longClickCode = getCodeForToolbarKeyLongClick(tag)
+        if (longClickCode != KeyCode.UNSPECIFIED) {
+            listener.onCodeInput(longClickCode, Constants.SUGGESTION_STRIP_COORDINATE, Constants.SUGGESTION_STRIP_COORDINATE, false)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility") // no need for View#performClick, we only return false mostly anyway
+    private fun onLongClickSuggestion(wordView: TextView): Boolean {
+        var showIcon = true
+        if (wordView.tag is Int) {
+            val index = wordView.tag as Int
+            val type = suggestedWords.getInfo(index).mSourceDict
+            if (type == Dictionary.DICTIONARY_USER_TYPED || type == Dictionary.DICTIONARY_HARDCODED)
+                showIcon = false
+        }
+        if (showIcon) {
+            val icon = KeyboardIconsSet.instance
+                .getNewDrawable(KeyboardIconsSet.NAME_BIN, context)
+                ?: return false
+            Settings.getValues().mColors.setColor(icon, ColorType.REMOVE_SUGGESTION_ICON)
+            val w = icon.intrinsicWidth
+            val h = icon.intrinsicHeight
+            wordView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+            wordView.ellipsize = TextUtils.TruncateAt.END
+            val downOk = AtomicBoolean(false)
+            wordView.setOnTouchListener { _, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_UP && downOk.get()) {
+                    val x = motionEvent.x
+                    val y = motionEvent.y
+                    if (0 < x && x < w && 0 < y && y < h) {
+                        removeSuggestion(wordView)
+                        wordView.cancelLongPress()
+                        wordView.isPressed = false
+                        return@setOnTouchListener true
+                    }
+                } else if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    val x = motionEvent.x
+                    val y = motionEvent.y
+                    if (0 < x && x < w && 0 < y && y < h) {
+                        downOk.set(true)
+                    }
+                }
+                false
+            }
+        }
+        if (DebugFlags.DEBUG_ENABLED && (isShowingMoreSuggestionPanel || !showMoreSuggestions())) {
+            showSourceDict(wordView)
+            return true
+        }
+        return showMoreSuggestions()
+    }
+
+    private fun showMoreSuggestions(): Boolean {
+        if (suggestedWords.size() <= startIndexOfMoreSuggestions) {
+            return false
+        }
+        if (!moreSuggestionsView.show(
+                suggestedWords, startIndexOfMoreSuggestions, moreSuggestionsContainer, layoutHelper, this
+        ))
+            return false
+        for (i in 0..<startIndexOfMoreSuggestions) {
+            wordViews[i].isPressed = false
+        }
+        return true
+    }
+
+    private fun showSourceDict(wordView: TextView) {
+        val word = wordView.text.toString()
+        val index = wordView.tag as? Int ?: return
+        if (index >= suggestedWords.size()) return
+        val info = suggestedWords.getInfo(index)
+        if (info.word != word) return
+
+        val text = info.mSourceDict.mDictType + ":" + info.mSourceDict.mLocale
+        if (isShowingMoreSuggestionPanel) {
+            moreSuggestionsView.dismissPopupKeysPanel()
+        }
+        KeyboardSwitcher.getInstance().showToast(text, true)
+    }
+
+    private fun removeSuggestion(wordView: TextView) {
+        val word = wordView.text.toString()
+        listener.removeSuggestion(word)
+        moreSuggestionsView.dismissPopupKeysPanel()
+        // show suggestions, but without the removed word
+        val suggestedWordInfos = ArrayList<SuggestedWordInfo>()
+        for (i in 0..<suggestedWords.size()) {
+            val info = suggestedWords.getInfo(i)
+            if (info.word != word) suggestedWordInfos.add(info)
+        }
+        suggestedWords.mRawSuggestions?.removeFirst { it.word == word }
+
+        val newSuggestedWords = SuggestedWords(
+            suggestedWordInfos, suggestedWords.mRawSuggestions, suggestedWords.typedWordInfo, suggestedWords.mTypedWordValid,
+            suggestedWords.mWillAutoCorrect, suggestedWords.mIsObsoleteSuggestions, suggestedWords.mInputStyle, suggestedWords.mSequenceNumber
+        )
+        setSuggestions(newSuggestedWords, direction != 1)
+        updateSuggestionContainersVisibility(true)
+
+        // Show the toolbar if no suggestions are left and the "Auto show toolbar" setting is enabled
+        if (this.suggestedWords.isEmpty && Settings.getValues().mAutoShowToolbar) {
+            setToolbarVisibility(true)
+        }
+    }
+
+    private fun clear() {
+        suggestionsStrip.removeAllViews()
+        suggestionsChipStrip.removeAllViews()
+        if (DEBUG_SUGGESTIONS) removeAllDebugInfoViews()
+        if (!toolbarContainer.isVisible)
+            updateSuggestionContainersVisibility(true)
+        dismissMoreSuggestionsPanel()
+        for (word in wordViews) {
+            word.setOnTouchListener(null)
+        }
+    }
+
+    private fun removeAllDebugInfoViews() {
+        for (debugInfoView in debugInfoViews) {
+            val parent = debugInfoView.parent
+            if (parent is ViewGroup) {
+                parent.removeView(debugInfoView)
+            }
+        }
+    }
+
+    fun updateVoiceKey() {
+        val show = Settings.getValues().mShowsVoiceInputKey
+        toolbar.findViewWithTag<View>(ToolbarKey.VOICE)?.isVisible = show
+        activatedStateVersion.intValue++
+        if (persistentToolbarKey.tag == ToolbarKey.VOICE) {
+            persistentToolbarKey.isVisible = show
+        }
+    }
+
+    private fun updateKeys() {
+        val settingsValues = Settings.getValues()
+        toolbarContainer.isVisible = false
+        toolbarExpandKey?.isVisible = false
+        toolbarExpandKey?.setOnClickListener(null)
+        updatePersistentToolbarKey()
+        populatePinnedKeys()
+        updateVoiceKey()
+        updateSuggestionContainersVisibility(true)
+        // Restore access point icon to default grid when menu is closed
+        setAccessPointIcon(isMenuOpen = false)
+    }
+
+    private fun shouldUseChipSuggestions(words: SuggestedWords = suggestedWords): Boolean {
+        return Settings.getValues().mUseFiveWordSuggestionChips && shouldShowSuggestionContent(words)
+    }
+
+    private fun shouldShowSuggestionContent(words: SuggestedWords = suggestedWords): Boolean {
+        return !words.isEmpty && !words.isPunctuationSuggestions && words.getWordCountToShow() > 0
+    }
+
+    private fun shouldPreferPinnedKeysOverPredictions(words: SuggestedWords = suggestedWords): Boolean {
+        return words.mInputStyle == SuggestedWords.INPUT_STYLE_BEGINNING_OF_SENTENCE_PREDICTION
+    }
+
+    private fun updateSuggestionContainersVisibility(showSuggestions: Boolean) {
+        if (isPinnedToolbarDragActive) {
+            suggestionsStrip.isVisible = false
+            suggestionsChipScroll.isVisible = false
+            pinnedKeys.isVisible = true
+            return
+        }
+        val hasPinnedKeys = slotsState.value.isNotEmpty()
+        if (isAccessPointMenuOpen) {
+            suggestionsStrip.isVisible = false
+            suggestionsChipScroll.isVisible = false
+            pinnedKeys.isVisible = hasPinnedKeys
+            return
+        }
+        val toolbarMode = Settings.getValues().mToolbarMode
+        val allowPinnedKeys = toolbarMode == ToolbarMode.EXPANDABLE || toolbarMode == ToolbarMode.TOOLBAR_KEYS
+        val allowSuggestions = toolbarMode == ToolbarMode.EXPANDABLE || toolbarMode == ToolbarMode.SUGGESTION_STRIP ||
+                (isExternalSuggestionVisible && forceExternalSuggestionVisible)
+        val preferPinnedKeys = showSuggestions &&
+                allowPinnedKeys &&
+                hasPinnedKeys &&
+                !isExternalSuggestionVisible &&
+                shouldPreferPinnedKeysOverPredictions()
+        val showSuggestionContent = showSuggestions && allowSuggestions &&
+                !preferPinnedKeys &&
+                (isExternalSuggestionVisible || shouldShowSuggestionContent())
+        val showChips = showSuggestionContent && !isExternalSuggestionVisible && shouldUseChipSuggestions()
+        suggestionsStrip.isVisible = showSuggestionContent && !showChips
+        suggestionsChipScroll.isVisible = showChips
+        pinnedKeys.isVisible = showSuggestions && allowPinnedKeys && !showSuggestionContent && hasPinnedKeys
+    }
+
+    private fun populatePinnedKeys(
+        previewSlots: List<Any>? = null,
+    ) {
+        val persistentKey = Settings.getValues().mPersistentToolbarKey
+        val slots = previewSlots ?: getPinnedToolbarKeys(context.prefs(), persistentKey)
+        slotsState.value = slots
+        pinnedKeys.isVisible = slots.isNotEmpty()
+    }
+
+    private fun updatePersistentToolbarKey() {
+        val settingsValues = Settings.getValues()
+        val colors = settingsValues.mColors
+        val key = settingsValues.mPersistentToolbarKey
+        persistentToolbarKey.tag = key
+        persistentToolbarKey.contentDescription = key.name.lowercase().getStringResourceOrName("", context)
+        persistentToolbarKey.setImageDrawable(KeyboardIconsSet.instance.getNewDrawable(key.name, context))
+        setupKey(persistentToolbarKey, colors)
+        applyAlphabetIconTint(persistentToolbarKey, colors)
+        applySpecialKeyCircleBackground(persistentToolbarKey, colors)
+        updateToolbarButtonActivatedState(persistentToolbarKey)
+        persistentToolbarKey.isVisible = key != ToolbarKey.VOICE || settingsValues.mShowsVoiceInputKey
+    }
+
+    fun updateThemeColors(colors: Colors) {
+        colors.setBackground(this, ColorType.STRIP_BACKGROUND)
+        findViewById<ImageButton>(R.id.access_point_trigger_btn)?.let {
+            applyAlphabetIconTint(it, colors)
+            applySpecialKeyCircleBackground(it, colors)
+        }
+        updatePersistentToolbarKey()
+        colorsState.value = colors
+        invalidate()
+    }
+
+    private fun onPinnedToolbarDrag(target: View, event: DragEvent): Boolean {
+        val key = getToolbarKeyFromDragData(event.localState, event.clipData) ?: return false
+        val dragState = event.localState as? ToolbarDragState
+        val dragSource = dragState?.source ?: ToolbarDragSource.ACCESS_POINT_MENU
+        if (!canDropToolbarKeyInPinnedRow(key)) return false
+
+        return when (event.action) {
+            DragEvent.ACTION_DRAG_STARTED -> {
+                true
+            }
+            DragEvent.ACTION_DRAG_ENTERED, DragEvent.ACTION_DRAG_LOCATION -> {
+                val index = pinnedDropIndexFromEvent(target, event, dragSource)
+                if (index == null) {
+                    clearPinnedDropPreview()
+                } else {
+                    showPinnedDropPreview(key, index, dragSource)
+                }
+                true
+            }
+            DragEvent.ACTION_DROP -> {
+                if (pinnedDropPreviewIndex >= 0) {
+                    val pinned = pinToolbarKeyAt(context.prefs(), key, pinnedDropPreviewIndex)
+                    populatePinnedKeys(pinned)
+                    KeyboardSwitcher.getInstance().accessPointMenuView?.populateMenu()
+                    AudioAndHapticFeedbackManager.getInstance().performHapticFeedback(this, HapticEvent.KEY_PRESS)
+                }
+                true
+            }
+            DragEvent.ACTION_DRAG_ENDED -> {
+                dragState?.sourceView?.visibility = VISIBLE
+                clearPinnedDropPreview()
+                true
+            }
+            else -> true
+        }
+    }
+
+    private fun canDropToolbarKeyInPinnedRow(key: ToolbarKey): Boolean {
+        val toolbarMode = Settings.getValues().mToolbarMode
+        val pinnedRowEnabled = toolbarMode == ToolbarMode.EXPANDABLE || toolbarMode == ToolbarMode.TOOLBAR_KEYS
+        return pinnedRowEnabled && key != ToolbarKey.CLOSE_HISTORY && key != Settings.getValues().mPersistentToolbarKey
+    }
+
+    private fun getSortedSlotBounds(): List<PinnedSlotBounds> {
+        return pinnedSlotBounds.values.sortedBy { it.left }
+    }
+
+    private fun pinnedDropIndexFromEvent(target: View, event: DragEvent, source: ToolbarDragSource): Int? {
+        val slots = getSortedSlotBounds()
+        if (slots.isEmpty()) return if (source == ToolbarDragSource.ACCESS_POINT_MENU) 0 else null
+
+        target.getLocationOnScreen(dragTargetScreenLocation)
+        pinnedKeys.getLocationOnScreen(pinnedScreenLocation)
+        val xInPinned = event.x + dragTargetScreenLocation[0] - pinnedScreenLocation[0]
+
+        for (i in slots.indices) {
+            val child = slots[i]
+            if (xInPinned >= child.left && xInPinned <= child.right) {
+                return visualIndexToPinnedIndex(i, slots.size)
+            }
+        }
+
+        val physicalIndex = when {
+            xInPinned < slots.first().left -> 0
+            xInPinned > slots.last().right -> {
+                if (slots.size >= MAX_PINNED_TOOLBAR_KEYS && source == ToolbarDragSource.ACCESS_POINT_MENU) return null
+                slots.size
+            }
+            else -> {
+                val gapIndex = slots.indexOfFirst { xInPinned < it.left }
+                if (gapIndex >= 0) gapIndex else slots.size
+            }
+        }
+        return visualIndexToPinnedIndex(physicalIndex, slots.size)
+    }
+
+    private fun showPinnedDropPreview(key: ToolbarKey, requestedIndex: Int, source: ToolbarDragSource) {
+        if (pinnedDropPreviewKey == key
+            && pinnedDropPreviewSource == source
+            && pinnedDropPreviewRequestedIndex == requestedIndex
+            && slotsState.value.isNotEmpty()
+        ) {
+            return
+        }
+        val current = getPinnedToolbarKeys(context.prefs(), Settings.getValues().mPersistentToolbarKey).toMutableList()
+        val previewSlots = if (source == ToolbarDragSource.PINNED_ROW) {
+            current.remove(key)
+            current.toMutableList<Any>().apply {
+                add(requestedIndex.coerceIn(0, size), PinnedDropPlaceholder)
+            }.take(MAX_PINNED_TOOLBAR_KEYS)
+        } else {
+            current.remove(key)
+            val slots = current.toMutableList<Any>()
+            slots.add(requestedIndex.coerceIn(0, slots.size), PinnedDropPlaceholder)
+            slots.take(MAX_PINNED_TOOLBAR_KEYS)
+        }
+        val previewIndex = previewSlots.indexOf(PinnedDropPlaceholder).coerceAtLeast(0)
+        if (pinnedDropPreviewKey == key && pinnedDropPreviewIndex == previewIndex && slotsState.value.isNotEmpty()) {
+            return
+        }
+        isPinnedToolbarDragActive = true
+        pinnedDropPreviewKey = key
+        pinnedDropPreviewSource = source
+        pinnedDropPreviewRequestedIndex = requestedIndex
+        pinnedDropPreviewIndex = previewIndex
+        populatePinnedKeys(previewSlots)
+        updateSuggestionContainersVisibility(true)
+    }
+
+    private fun pinnedSlotLayoutParams(width: Int): LinearLayout.LayoutParams {
+        val stripHeight = resources.getDimensionPixelSize(R.dimen.config_suggestions_strip_height)
+        val circleVisualSize = 40.dpToPx(resources) - 2 * 3.dpToPx(resources) // matches circle buttons: 40dp - 3dp inset each side = 34dp
+        return LinearLayout.LayoutParams(width, circleVisualSize).apply {
+            val verticalMargin = (stripHeight - circleVisualSize) / 2
+            topMargin = verticalMargin
+            bottomMargin = verticalMargin
+        }
+    }
+
+    private fun pinnedButtonWidth(slotCount: Int, availableWidthOverride: Int = 0): Int {
+        val circleVisualSize = 40.dpToPx(resources) - 2 * 3.dpToPx(resources) // 34dp to match circle buttons
+        val desiredWidth = (circleVisualSize * 1.58f).toInt()
+        val availableWidth = availableWidthOverride.takeIf { it > 0 } ?: pinnedKeys.width.takeIf { it > 0 } ?: suggestionsMiddleContainer.width
+        if (availableWidth <= 0) return desiredWidth
+        val visibleSlotCount = slotCount.coerceIn(1, MAX_PINNED_TOOLBAR_KEYS)
+        // Horizontal padding (4dp on each side) = 8dp. Spacing between visibleSlotCount items = (visibleSlotCount - 1) * 8dp.
+        // Total spacing + padding = visibleSlotCount * 8dp!
+        val spacingAndPadding = 8.dpToPx(resources) * visibleSlotCount
+        val maxWidthForSlots = ((availableWidth - spacingAndPadding) / visibleSlotCount).coerceAtLeast(1)
+        val minimumWidth = 32.dpToPx(resources).coerceAtMost(maxWidthForSlots)
+        return desiredWidth.coerceAtMost(maxWidthForSlots).coerceAtLeast(minimumWidth)
+    }
+
+    private fun pinnedSpacerLayoutParams() =
+        LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
+
+    private fun createPinnedDropPlaceholder(colors: Colors): View {
+        return View(context).apply {
+            tag = PinnedDropPlaceholder
+            background = createToolbarPillBackground(colors)
+            alpha = 0.45f
+        }
+    }
+
+    private fun pinnedSlotViews(): List<View> {
+        pinnedSlotViewScratch.clear()
+        for (i in 0 until pinnedKeys.childCount) {
+            val child = pinnedKeys.getChildAt(i)
+            if (child.tag is ToolbarKey || child.tag === PinnedDropPlaceholder) pinnedSlotViewScratch.add(child)
+        }
+        return pinnedSlotViewScratch
+    }
+
+    private fun visualIndexToPinnedIndex(physicalIndex: Int, slotCount: Int): Int {
+        return if (pinnedKeys.layoutDirection == LAYOUT_DIRECTION_RTL) {
+            (slotCount - physicalIndex).coerceIn(0, slotCount)
+        } else {
+            physicalIndex.coerceIn(0, slotCount)
+        }
+    }
+
+    private fun clearPinnedDropPreview() {
+        draggingKeyInComposeState.value = null
+        if (!isPinnedToolbarDragActive && pinnedDropPreviewKey == null) {
+            updateKeys()
+            return
+        }
+        isPinnedToolbarDragActive = false
+        pinnedDropPreviewKey = null
+        pinnedDropPreviewSource = null
+        pinnedDropPreviewRequestedIndex = -1
+        pinnedDropPreviewIndex = -1
+        updateKeys()
+    }
+
+    private fun startPinnedToolbarDrag(view: View, key: ToolbarKey) {
+        val clipData = ClipData.newPlainText(TOOLBAR_DRAG_CLIP_LABEL, key.name)
+        view.visibility = INVISIBLE
+        view.startDragAndDropCompat(clipData, DragShadowBuilder(view), ToolbarDragState(key, ToolbarDragSource.PINNED_ROW, view))
+    }
+
+    private fun applyToolbarPillBackground(view: ImageButton, colors: Colors) {
+        applySuggestionStripButtonIconSizing(view)
+        view.background = createToolbarPillBackground(colors)
+    }
+
+    private fun applySpecialKeyCircleBackground(view: ImageButton, colors: Colors) {
+        applySuggestionStripButtonIconSizing(view)
+        view.background = createSpecialKeyCircleBackground(colors)
+    }
+
+    private fun applyAlphabetIconTint(view: ImageButton, colors: Colors) {
+        view.clearColorFilter()
+        view.imageTintMode = PorterDuff.Mode.SRC_IN
+        view.imageTintList = ColorStateList.valueOf(colors.get(ColorType.KEY_TEXT))
+    }
+
+    private fun applySuggestionStripButtonIconSizing(view: ImageButton) {
+        view.setMinimumWidth(0)
+        view.setMinimumHeight(0)
+        view.setPadding(0, 0, 0, 0)
+        view.scaleType = android.widget.ImageView.ScaleType.CENTER
+        val drawable = view.drawable ?: return
+        if (drawable is FixedSizeDrawable) return
+        val tint = view.imageTintList
+        view.setImageDrawable(FixedSizeDrawable(drawable.mutate(), 20.dpToPx(resources)))
+        view.imageTintList = tint
+    }
+
+    private fun createToolbarPillBackground(colors: Colors): Drawable {
+        val circleVisualSize = 40.dpToPx(resources) - 2 * 3.dpToPx(resources) // 34dp to match circle buttons
+        val horizontalInset = 2.dpToPx(resources)
+        val verticalInset = 0 // height is now controlled by layout params, no extra inset needed
+        val cornerRadius = when (colors.themeStyle) {
+            KeyboardTheme.STYLE_HOLO -> 0f
+            KeyboardTheme.STYLE_MATERIAL -> 8.dpToPx(resources).toFloat()
+            KeyboardTheme.STYLE_ROUNDED, KeyboardTheme.STYLE_CIRCLE -> circleVisualSize / 2f
+            else -> 8.dpToPx(resources).toFloat()
+        }
+        val background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(KeyBackgroundUtils.fillColorFor(colors, ColorType.KEY_BACKGROUND))
+            setCornerRadius(cornerRadius)
+        }
+        return InsetDrawable(background, horizontalInset, verticalInset, horizontalInset, verticalInset)
+    }
+
+    private fun createSpecialKeyCircleBackground(colors: Colors): Drawable {
+        val circle = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(Color.WHITE)
+            colors.setColor(this, ColorType.SPECIAL_KEY_BACKGROUND)
+        }
+        val horizontalInset = 3.dpToPx(resources)
+        val verticalInset = 3.dpToPx(resources)
+        return InsetDrawable(circle, horizontalInset, verticalInset, horizontalInset, verticalInset)
+    }
+
+    private fun setupKey(view: ImageButton, colors: Colors) {
+        view.setOnClickListener(this)
+        view.setOnLongClickListener(this)
+        colors.setColor(view, ColorType.TOOL_BAR_KEY)
+        colors.setBackground(view, ColorType.STRIP_BACKGROUND)
+    }
+
+    private fun setAccessPointIcon(isMenuOpen: Boolean) {
+        isAccessPointMenuOpen = isMenuOpen
+        val colors = Settings.getValues().mColors
+        val drawable = if (isMenuOpen) {
+            androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_arrow_back)?.mutate()
+        } else {
+            androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_access_point_grid)?.mutate()
+        } ?: return
+        accessPointTriggerBtn.setImageDrawable(drawable)
+        applyAlphabetIconTint(accessPointTriggerBtn, colors)
+        applySuggestionStripButtonIconSizing(accessPointTriggerBtn)
+        updateSuggestionContainersVisibility(true)
+    }
+
+    companion object {
+        @JvmField
+        var DEBUG_SUGGESTIONS = false
+        private const val DEBUG_INFO_TEXT_SIZE_IN_DIP = 6.5f
+        private val TAG = SuggestionStripView::class.java.simpleName
+        private val PinnedDropPlaceholder = Any()
+    }
+
+    private class FixedSizeDrawable(
+        private val wrapped: Drawable,
+        private val size: Int
+    ) : Drawable() {
+        override fun draw(canvas: Canvas) {
+            val currentBounds = bounds
+            val left = currentBounds.left + (currentBounds.width() - size) / 2
+            val top = currentBounds.top + (currentBounds.height() - size) / 2
+            wrapped.setBounds(left, top, left + size, top + size)
+            wrapped.draw(canvas)
+        }
+
+        override fun setAlpha(alpha: Int) {
+            wrapped.alpha = alpha
+        }
+
+        override fun setColorFilter(colorFilter: ColorFilter?) {
+            wrapped.colorFilter = colorFilter
+        }
+
+        override fun setTint(tintColor: Int) {
+            wrapped.setTint(tintColor)
+        }
+
+        override fun setTintList(tint: ColorStateList?) {
+            wrapped.setTintList(tint)
+        }
+
+        override fun setTintMode(tintMode: PorterDuff.Mode?) {
+            wrapped.setTintMode(tintMode)
+        }
+
+        override fun isStateful(): Boolean = wrapped.isStateful
+
+        override fun onStateChange(state: IntArray): Boolean = wrapped.setState(state)
+
+        override fun getIntrinsicWidth(): Int = size
+
+        override fun getIntrinsicHeight(): Int = size
+
+        override fun mutate(): Drawable {
+            wrapped.mutate()
+            return this
+        }
+
+        @Deprecated("Deprecated in Java")
+        override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
+    }
+
+    private class ButtonDragShadowBuilder(
+        context: Context,
+        val key: ToolbarKey
+    ) : View.DragShadowBuilder() {
+        private val icon = KeyboardIconsSet.instance.getNewDrawable(key.name, context)
+        private val size = 34.dpToPx(context.resources)
+
+        init {
+            val colors = Settings.getValues().mColors
+            icon?.mutate()?.setTint(colors.get(ColorType.KEY_TEXT))
+        }
+
+        override fun onProvideShadowMetrics(outShadowSize: android.graphics.Point, outShadowTouchPoint: android.graphics.Point) {
+            outShadowSize.set(size, size)
+            outShadowTouchPoint.set(size / 2, size / 2)
+        }
+
+        override fun onDrawShadow(canvas: android.graphics.Canvas) {
+            icon?.let {
+                it.setBounds(0, 0, size, size)
+                it.draw(canvas)
+            }
+        }
+    }
+
+    private class ComposeLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
+        private val lifecycleRegistry = LifecycleRegistry(this)
+        private val savedStateRegistryController = SavedStateRegistryController.create(this)
+        private val store = ViewModelStore()
+
+        init {
+            savedStateRegistryController.performRestore(null)
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        }
+
+        fun start() {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        }
+
+        fun stop() {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
+
+        fun destroy() {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            store.clear()
+        }
+
+        override val lifecycle: Lifecycle
+            get() = lifecycleRegistry
+
+        override val savedStateRegistry: SavedStateRegistry
+            get() = savedStateRegistryController.savedStateRegistry
+
+        override val viewModelStore: ViewModelStore
+            get() = store
+    }
+}

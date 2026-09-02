@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <!-- Stable AI-tool ids live in AiWritingToolsView; only their presentation is localized. -->
+    <string name="ai_tool_spell_check">Sửa chính tả</string>
+    <string name="ai_tool_rewrite">Viết lại</string>
+    <string name="ai_tool_formal">Trang trọng</string>
+    <string name="ai_tool_friendly">Thân mật</string>
+    <string name="ai_tool_concise">Ngắn gọn</string>
+    <string name="ai_placeholder_no_text">Hãy nhập văn bản trước khi dùng công cụ viết bằng AI.</string>
+    <string name="ai_placeholder_select_tool">Chọn một công cụ ở trên để bắt đầu…</string>
+    <string name="ai_thinking">Đang xử lý…</string>
+    <string name="ai_no_variations">Không nhận được biến thể nào.</string>
+    <string name="ai_error_cloud_disabled">Các tính năng đám mây đang tắt. Hãy bật chúng trong Cài đặt để dùng công cụ viết bằng AI.</string>
+    <string name="ai_error_prefix">Lỗi: %1$s</string>
+    <string name="ai_error_input_too_large">Văn bản đã chọn quá dài cho công cụ viết bằng AI.</string>
+    <string name="ai_error_api_key_missing">Hãy nhập khóa API Gemini trong Cài đặt trước.</string>
+    <string name="ai_error_models_initializing">Đang chuẩn bị các mô hình AI. Hãy thử lại sau vài giây.</string>
+    <string name="ai_error_generation_in_progress">AI đang xử lý. Hãy chờ yêu cầu hiện tại hoàn tất.</string>
+    <string name="ai_error_unavailable">AI hiện không khả dụng. Hãy thử lại sau.</string>
+    <string name="ai_error_model_list_refreshed">Danh sách mô hình AI đã được làm mới. Hãy nhấn lại công cụ.</string>
+    <string name="ai_error_invalid_api_key">Khóa API Gemini không hợp lệ. Hãy kiểm tra trong Cài đặt.</string>
+    <string name="ai_error_empty_response">AI trả về phản hồi trống. Hãy thử lại.</string>
+    <string name="ai_error_invalid_response">AI trả về phản hồi không hợp lệ.</string>
+    <string name="ai_error_quota">Hạn mức Gemini tạm thời đã hết. Hãy thử lại sau %1$d giây.</string>
+    <string name="ai_toast_no_text">Không có văn bản để xử lý.</string>
+    <string name="ai_toast_text_replaced">Đã thay văn bản</string>
+    <string name="ai_toast_copied">Đã sao chép vào bảng nhớ tạm</string>
+    <string name="ai_clipboard_label">Kết quả AI</string>
+    <string name="ai_visual_effects">Hiệu ứng hình ảnh AI</string>
+    <string name="ai_visual_effects_summary">Tự động giảm hiệu ứng khi máy tiết kiệm pin hoặc ít bộ nhớ.</string>
+    <string name="ai_visual_effects_auto">Tự động</string>
+    <string name="ai_visual_effects_full">Đầy đủ</string>
+    <string name="ai_visual_effects_reduced">Giảm bớt</string>
+    <string name="ai_visual_effects_off">Tắt</string>
+</resources>

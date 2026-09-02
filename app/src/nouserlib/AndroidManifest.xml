@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      This component is deliberately compiled into the .internal smoke-test package only.
+      It gives device automation a neutral editor and must never be merged into release.
+    -->
+    <application>
+        <activity
+            android:name="helium314.keyboard.internal.ImeSmokeTestActivity"
+            android:exported="true"
+            android:label="@string/ime_smoke_test_title"
+            android:theme="@style/platformActivityTheme"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+    </application>
+</manifest>

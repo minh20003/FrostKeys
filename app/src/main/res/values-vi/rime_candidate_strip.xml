@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtype_chinese_rime">Tiếng Trung Pinyin (Rime)</string>
+    <string name="rime_mode_simplified">Giản thể</string>
+    <string name="rime_mode_traditional">Phồn thể</string>
+    <string name="rime_mode_selector">Đầu ra: %1$s</string>
+    <string name="rime_candidate_previous_page">Trang ứng viên trước</string>
+    <string name="rime_candidate_next_page">Trang ứng viên tiếp theo</string>
+    <string name="rime_cancel_composition">Hủy nhập tiếng Trung</string>
+    <string name="rime_candidate_number">Ứng viên %1$d: %2$s</string>
+    <string name="rime_candidates_loading">Đang tải bộ gõ tiếng Trung…</string>
+    <string name="rime_candidates_ready">Nhập Pinyin để chuyển đổi</string>
+    <string name="rime_candidates_empty">Không có ứng viên chuyển đổi</string>
+    <string name="rime_candidates_unavailable">Không thể dùng chuyển đổi tiếng Trung</string>
+</resources>

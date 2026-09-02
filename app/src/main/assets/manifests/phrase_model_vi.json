@@ -1,0 +1,16 @@
+{
+  "artifact": "dicts/vi_phrase_model_v1.tsv",
+  "byteCount": 1556,
+  "entryCount": 66,
+  "formatVersion": 1,
+  "license": "GPL-3.0-only",
+  "locale": "vi",
+  "maxCandidatesPerContext": 3,
+  "maxEntries": 128,
+  "sha256": "fe2f07b4f252a4eb81d690422cfb9d8b8aa41f185bf641af9d08318e28f09c85",
+  "source": "FrostKeys original curated Vietnamese phrase seed v1",
+  "sourceByteCount": 1966,
+  "sourceLicense": "GPL-3.0-only",
+  "sourceSha256": "86f26f8b69c58f15d7c03c0e3d23161ea32c2289c99d985754d3f43c78850d07",
+  "version": "seed-v1"
+}

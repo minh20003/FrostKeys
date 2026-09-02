@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "androidNdk": {
+    "revision": "28.0.13004108",
+    "host": "linux-x86_64",
+    "archive": {
+      "url": "https://dl.google.com/android/repository/android-ndk-r28-linux.zip",
+      "bytes": 723148067,
+      "sha1": "894f469c5192a116d21f412de27966140a530ebc",
+      "sha256": "a186b67e8810cb949514925e4f7a2255548fb55f5e9b0824a6430d012c1b695b",
+      "metadata": "https://dl.google.com/android/repository/repository2-3.xml"
+    }
+  },
+  "bazel": {
+    "version": "9.0.2",
+    "host": "linux-x86_64",
+    "url": "https://github.com/bazelbuild/bazel/releases/download/9.0.2/bazel-9.0.2-linux-x86_64",
+    "sha256": "422e7a1690b76d7e615c29091d3aca28d0bd3a93fe3c93cbefb8f72d774926d5"
+  }
+}

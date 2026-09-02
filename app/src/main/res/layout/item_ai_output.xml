@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_ai_output"
+    android:layout_margin="4dp">
+
+    <ScrollView
+        android:id="@+id/sv_ai_output"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="44dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/tv_ai_output"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="16sp" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_use_this"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:minHeight="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/ai_use_this"
+        android:textAllCaps="false"
+        android:drawableStart="@drawable/ic_check_small"
+        android:drawablePadding="6dp"
+        android:background="@drawable/bg_pill_button"
+        android:textColor="#FFFFFF"
+        android:elevation="0dp"
+        android:stateListAnimator="@null" />
+
+    <View
+        android:id="@+id/applied_feedback_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/applied_feedback_check"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@null"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        android:padding="16dp"
+        android:scaleType="center"
+        android:scaleX="0.86"
+        android:scaleY="0.86"
+        android:src="@drawable/ic_check_small"
+        android:visibility="gone" />
+</FrameLayout>

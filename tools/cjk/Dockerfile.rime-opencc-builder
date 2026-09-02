@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# Host-only builder for the OpenCC conversion data consumed by the pinned
+# librime checkout.  It deliberately has no Android NDK and cannot package an
+# APK: it only runs the host `opencc_dict` generator and verifies the result.
+#
+# The digest, rather than a mutable tag, is part of the build contract.  The
+# generated manifest also records the package/tool versions that were actually
+# installed in this image; release packaging must independently verify the
+# resulting data hashes.
+FROM ubuntu@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        cmake \
+        git \
+        ninja-build \
+        python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY build-rime-opencc-data.sh /usr/local/bin/build-rime-opencc-data.sh
+COPY cjk_source_lock.py engine-sources.json verify-pinned-cjk-sources.py /opt/frostkeys/cjk/
+
+RUN chmod 0755 /usr/local/bin/build-rime-opencc-data.sh
+
+ENV FROSTKEYS_CJK_TOOL_ROOT=/opt/frostkeys/cjk
+WORKDIR /workspace
+ENTRYPOINT ["/usr/local/bin/build-rime-opencc-data.sh"]

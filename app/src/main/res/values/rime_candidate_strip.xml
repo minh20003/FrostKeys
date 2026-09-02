@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Maintained non-Vietnamese UI locales intentionally inherit English for this optional row. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="subtype_chinese_rime">Chinese Pinyin (Rime)</string>
+    <string name="rime_mode_simplified">Simplified</string>
+    <string name="rime_mode_traditional">Traditional</string>
+    <string name="rime_mode_selector">Output: %1$s</string>
+    <string name="rime_candidate_previous_page">Previous candidate page</string>
+    <string name="rime_candidate_next_page">Next candidate page</string>
+    <string name="rime_cancel_composition">Cancel Chinese composition</string>
+    <string name="rime_candidate_number">Candidate %1$d: %2$s</string>
+    <string name="rime_candidates_loading">Loading Chinese input…</string>
+    <string name="rime_candidates_ready">Type Pinyin to convert</string>
+    <string name="rime_candidates_empty">No conversion candidates</string>
+    <string name="rime_candidates_unavailable">Chinese conversion is unavailable</string>
+</resources>

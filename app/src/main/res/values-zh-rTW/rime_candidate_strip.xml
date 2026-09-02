@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtype_chinese_rime">中文拼音（Rime）</string>
+    <string name="rime_mode_simplified">簡體</string>
+    <string name="rime_mode_traditional">繁體</string>
+    <string name="rime_mode_selector">輸出：%1$s</string>
+    <string name="rime_candidate_previous_page">上一頁候選</string>
+    <string name="rime_candidate_next_page">下一頁候選</string>
+    <string name="rime_cancel_composition">取消中文輸入</string>
+    <string name="rime_candidate_number">候選 %1$d：%2$s</string>
+    <string name="rime_candidates_loading">正在載入中文輸入…</string>
+    <string name="rime_candidates_ready">輸入拼音以轉換</string>
+    <string name="rime_candidates_empty">沒有轉換候選</string>
+    <string name="rime_candidates_unavailable">中文轉換無法使用</string>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <string name="hidden_features_message">► Nhấn giữ các phím thanh công cụ đã ghim sẽ có thêm chức năng: &lt;br&gt;
+\n\t• bảng nhớ tạm &amp;#65515; dán &lt;br&gt;
+\n\t• di chuyển trái/phải &amp;#65515; từ trái/phải &lt;br&gt;
+\n\t• di chuyển lên/xuống &amp;#65515; trang trước/sau &lt;br&gt;
+\n\t• từ trái/phải &amp;#65515; đầu/cuối dòng &lt;br&gt;
+\n\t• trang trước/sau &amp;#65515; đầu/cuối trang &lt;br&gt;
+\n\t• sao chép &amp;#65515; cắt &lt;br&gt;
+\n\t• chọn từ &amp;#8596; chọn tất cả &lt;br&gt;
+\n\t• hoàn tác &amp;#8596; làm lại &lt;br&gt; &lt;br&gt;
+\n► Nhấn giữ các phím trong thanh công cụ dải gợi ý sẽ ghim chúng vào dải gợi ý. &lt;br&gt; &lt;br&gt;
+\n► Nhấn giữ phím dấu phẩy để mở Bảng nhớ tạm, Emoji, Chế độ một tay, Cài đặt hoặc Chuyển ngôn ngữ: &lt;br&gt;
+\n\t• Emoji và Chuyển ngôn ngữ sẽ biến mất nếu bạn đã bật phím tương ứng; &lt;br&gt;
+\n\t• Với một số bố cục, đó không phải phím dấu phẩy mà là phím ở cùng vị trí, ví dụ phím “q” với bố cục Dvorak. &lt;br&gt; &lt;br&gt;
+\n► Khi bật chế độ ẩn danh, ứng dụng sẽ không học từ mới và không thêm emoji vào mục gần đây. &lt;br&gt; &lt;br&gt;
+\n► Nhấn biểu tượng Ẩn danh để mở thanh công cụ. &lt;br&gt; &lt;br&gt;
+\n► Nhập bằng phím trượt: vuốt từ Shift sang phím khác để gõ một chữ hoa: &lt;br&gt;
+\n\t• Cách này cũng hoạt động với phím “?123” để gõ một ký hiệu từ bàn phím ký hiệu và các phím liên quan. &lt;br&gt; &lt;br&gt;
+\n► Giữ Shift hoặc phím ký hiệu, nhấn một hay nhiều phím, rồi thả Shift hoặc phím ký hiệu để quay lại bàn phím trước đó. &lt;br&gt; &lt;br&gt;
+\n► Nhấn giữ một gợi ý trên dải gợi ý để hiện thêm gợi ý và nút xóa gợi ý này. &lt;br&gt; &lt;br&gt;
+\n► Vuốt lên từ một gợi ý để mở thêm gợi ý, rồi thả trên gợi ý để chọn. &lt;br&gt; &lt;br&gt;
+\n► Nhấn giữ một mục trong lịch sử bảng nhớ tạm để ghim (giữ trong bảng nhớ tạm cho tới khi bỏ ghim). &lt;br&gt; &lt;br&gt;
+\n► Vuốt sang trái trong bảng nhớ tạm để xóa một mục, trừ khi mục đã ghim. &lt;br&gt; &lt;br&gt;
+\n► Chọn văn bản rồi nhấn Shift để chuyển giữa chữ hoa, chữ thường và viết hoa đầu từ. &lt;br&gt; &lt;br&gt;
+\n► Bạn có thể thêm từ điển bằng cách mở chúng trong trình quản lý tệp: &lt;br&gt;
+\n\t• Cách này chỉ hoạt động với &lt;i&gt;content-uris&lt;/i&gt;, không hoạt động với &lt;i&gt;file-uris&lt;/i&gt;, nên có thể không dùng được với một số trình quản lý tệp. &lt;br&gt; &lt;br&gt;
+\n► Dành cho người dùng sao lưu thủ công có quyền root: &lt;br&gt;
+\n\t• Từ Android 7, tệp tùy chọn dùng chung không ở vị trí mặc định vì ứng dụng dùng %s. Điều này cần thiết để đọc cài đặt trước khi thiết bị được mở khóa, ví dụ lúc khởi động; &lt;br&gt;
+\n\t• Tệp nằm tại /data/user_de/0/package_id/shared_prefs/, tuy điều này có thể phụ thuộc thiết bị và phiên bản Android. &lt;br&gt; &lt;br&gt;
+\n&lt;i&gt;&lt;b&gt;Chế độ gỡ lỗi / APK gỡ lỗi&lt;/b&gt;&lt;/i&gt; &lt;br&gt; &lt;br&gt;
+\n► Nhấn giữ một gợi ý để xem từ điển nguồn. &lt;br&gt; &lt;br&gt;
+\n► Khi dùng APK gỡ lỗi, bạn có thể tìm Cài đặt gỡ lỗi trong Tùy chọn nâng cao, dù công dụng chủ yếu là đổ từ điển vào nhật ký. &lt;br&gt;
+\n\t• Với APK phát hành, hãy nhấn nhiều lần vào phiên bản trong &lt;i&gt;Giới thiệu&lt;/i&gt;, sau đó bạn sẽ thấy cài đặt gỡ lỗi trong &lt;i&gt;Tùy chọn nâng cao&lt;/i&gt;. &lt;br&gt;
+\n\t• Khi bật &lt;i&gt;Hiển thị thông tin gợi ý&lt;/i&gt;, gợi ý có các số nhỏ ở phía trên cho biết điểm nội bộ và từ điển nguồn. &lt;br&gt; &lt;br&gt;
+\n► Khi ứng dụng gặp sự cố, bạn sẽ được hỏi có muốn lấy nhật ký sự cố khi mở Cài đặt hay không. &lt;br&gt; &lt;br&gt;
+\n► Khi gõ đa ngôn ngữ, phím cách sẽ hiển thị giá trị tin cậy dùng để xác định ngôn ngữ hiện dùng. &lt;br&gt; &lt;br&gt;
+\n► Gợi ý có thể hiển thị các số nhỏ ở phía trên cho biết điểm nội bộ và từ điển nguồn; có thể tắt tính năng này.</string>
+</resources>

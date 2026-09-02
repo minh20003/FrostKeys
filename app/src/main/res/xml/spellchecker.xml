@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2011 The Android Open Source Project
+    modified
+    SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
+-->
+
+<!--
+    Advertise only dictionaries that the personal APK bundles offline. The build's verified
+    dictionary task supplies main_en-US.dict and main_vi.dict before assets are merged.
+-->
+<spell-checker xmlns:android="http://schemas.android.com/apk/res/android"
+        android:label="@string/spell_checker_service_name"
+        android:settingsActivity="helium314.keyboard.latin.spellcheck.SpellCheckerSettingsActivity">
+    <subtype
+        android:label="@string/subtype_en_US"
+        android:subtypeLocale="en_US" />
+    <subtype
+        android:label="@string/subtype_generic"
+        android:subtypeLocale="vi" />
+</spell-checker>

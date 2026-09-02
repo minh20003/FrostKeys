@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mozc_mode_hiragana">Hiragana</string>
+    <string name="mozc_mode_katakana">Katakana</string>
+    <string name="mozc_mode_latin">Chữ Latin</string>
+    <string name="mozc_mode_selector">Chế độ nhập: %1$s</string>
+    <string name="mozc_candidate_previous_page">Trang ứng viên trước</string>
+    <string name="mozc_candidate_next_page">Trang ứng viên tiếp theo</string>
+    <string name="mozc_cancel_composition">Hủy nhập tiếng Nhật</string>
+    <string name="mozc_candidate_number">Ứng viên %1$d: %2$s</string>
+    <string name="mozc_candidates_loading">Đang tải bộ gõ tiếng Nhật…</string>
+    <string name="mozc_candidates_ready">Nhập Romaji để chuyển đổi</string>
+    <string name="mozc_candidates_empty">Không có ứng viên chuyển đổi</string>
+    <string name="mozc_candidates_unavailable">Không thể dùng chuyển đổi tiếng Nhật</string>
+</resources>

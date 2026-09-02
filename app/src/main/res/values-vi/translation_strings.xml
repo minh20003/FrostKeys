@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <!-- Translation Panel -->
+    <string name="translation_title">Dịch</string>
+    <string name="translation_source_hint">Nhập văn bản để dịch…</string>
+    <string name="translation_result_hint">Bản dịch xuất hiện ở đây</string>
+    <string name="translation_action_translate">Dịch</string>
+    <string name="translation_action_retry">Thử lại</string>
+    <string name="translation_action_swap">Đổi ngôn ngữ</string>
+    <string name="translation_action_copy">Sao chép</string>
+    <string name="translation_action_insert">Chèn</string>
+    <string name="translation_action_close">Đóng</string>
+
+    <!-- Language Names -->
+    <string name="language_auto">Tự động nhận diện</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">Tiếng Anh</string>
+    <string name="language_chinese_simplified">Tiếng Trung (Giản thể)</string>
+    <string name="language_chinese_traditional">Tiếng Trung (Phồn thể)</string>
+    <string name="language_japanese">Tiếng Nhật</string>
+    <string name="language_korean">Tiếng Hàn</string>
+    <string name="language_thai">Tiếng Thái</string>
+    <string name="language_indonesian">Tiếng Indonesia</string>
+    <string name="language_french">Tiếng Pháp</string>
+    <string name="language_german">Tiếng Đức</string>
+    <string name="language_spanish">Tiếng Tây Ban Nha</string>
+    <string name="language_portuguese">Tiếng Bồ Đào Nha</string>
+    <string name="language_russian">Tiếng Nga</string>
+    <string name="language_arabic">Tiếng Ả Rập</string>
+    <string name="language_hindi">Tiếng Hindi</string>
+
+    <!-- States -->
+    <string name="translation_state_idle">Nhập văn bản và nhấn Dịch</string>
+    <string name="translation_state_translating">Đang dịch…</string>
+    <string name="translation_state_detecting">Đang nhận diện ngôn ngữ…</string>
+
+    <!-- Errors -->
+    <string name="translation_error_no_text">Không có văn bản để dịch</string>
+    <string name="translation_error_same_language">Ngôn ngữ nguồn và đích giống nhau</string>
+    <string name="translation_error_cloud_disabled">Các tính năng đám mây đang tắt. Hãy bật chúng trong Cài đặt để dùng tính năng dịch.</string>
+    <string name="translation_error_api_key_missing">Hãy nhập khóa API Gemini trong Cài đặt để dùng dịch thuật đám mây.</string>
+    <string name="translation_error_invalid_api_key">Khóa API Gemini không hợp lệ. Hãy kiểm tra trong Cài đặt.</string>
+    <string name="translation_error_quota">Hạn mức Gemini đã hết. Hãy thử lại sau %1$d giây.</string>
+    <string name="translation_error_unavailable">Dịch vụ dịch thuật không khả dụng. Hãy thử lại.</string>
+    <string name="translation_error_input_too_large">Văn bản quá dài. Tối đa %1$d ký tự.</string>
+    <string name="translation_error_on_device_unavailable">Dịch thuật trên thiết bị không khả dụng cho cặp ngôn ngữ này.</string>
+    <string name="translation_error_on_device_download">Mô hình dịch thuật trên thiết bị chưa được cài đặt. Nhấn để cài đặt.</string>
+    <string name="translation_error_safety_blocked">Bản dịch đã bị chặn vì lý do an toàn.</string>
+    <string name="translation_error_generic">Dịch thuật thất bại. Nhấn để thử lại.</string>
+
+    <!-- Toasts -->
+    <string name="translation_toast_copied">Đã sao chép bản dịch</string>
+    <string name="translation_toast_inserted">Đã chèn bản dịch</string>
+    <string name="translation_toast_source_same">Ngôn ngữ nguồn và đích giống nhau</string>
+
+    <!-- Provider Labels -->
+    <string name="translation_provider_gemini">Gemini</string>
+    <string name="translation_provider_on_device">Trên thiết bị</string>
+
+    <!-- Accessibility -->
+    <string name="translation_content_desc_source_field">Nhập văn bản nguồn</string>
+    <string name="translation_content_desc_result_field">Kết quả bản dịch</string>
+    <string name="translation_content_desc_swap_button">Đổi ngôn ngữ nguồn và đích</string>
+    <string name="translation_content_desc_source_language">Ngôn ngữ nguồn: %1$s</string>
+    <string name="translation_content_desc_target_language">Ngôn ngữ đích: %1$s</string>
+    <string name="translation_content_desc_translate_button">Dịch văn bản</string>
+    <string name="translation_content_desc_copy_button">Sao chép bản dịch</string>
+    <string name="translation_content_desc_insert_button">Chèn bản dịch vào trường văn bản</string>
+    <string name="translation_content_desc_close_button">Đóng bảng dịch</string>
+
+    <!-- Settings -->
+    <string name="translation_settings_title">Cài đặt dịch thuật</string>
+    <string name="translation_quality_title">Chất lượng dịch</string>
+    <string name="translation_quality_summary">Nhanh: kết quả nhanh hơn. Chất lượng cao: chất lượng tốt hơn.</string>
+    <string name="translation_quality_fast">Nhanh</string>
+    <string name="translation_quality_high">Chất lượng cao</string>
+    <string name="translation_source_language_title">Ngôn ngữ nguồn mặc định</string>
+    <string name="translation_source_language_summary">Để trống để tự động nhận diện</string>
+    <string name="translation_target_language_title">Ngôn ngữ đích mặc định</string>
+    <string name="translation_on_device_fallback_title">Dùng dịch thuật trên thiết bị</string>
+    <string name="translation_on_device_fallback_summary">Dùng dịch thuật cục bộ khi đám mây không khả dụng (trên thiết bị hỗ trợ)</string>
+</resources>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <!-- Translation Panel -->
+    <string name="translation_title">Translate</string>
+    <string name="translation_source_hint">Enter text to translate…</string>
+    <string name="translation_result_hint">Translation appears here</string>
+    <string name="translation_action_translate">Translate</string>
+    <string name="translation_action_retry">Retry</string>
+    <string name="translation_action_swap">Swap languages</string>
+    <string name="translation_action_copy">Copy</string>
+    <string name="translation_action_insert">Insert</string>
+    <string name="translation_action_close">Close</string>
+
+    <!-- Language Names -->
+    <string name="language_auto">Auto detect</string>
+    <string name="language_vietnamese">Vietnamese</string>
+    <string name="language_english">English</string>
+    <string name="language_chinese_simplified">Chinese (Simplified)</string>
+    <string name="language_chinese_traditional">Chinese (Traditional)</string>
+    <string name="language_japanese">Japanese</string>
+    <string name="language_korean">Korean</string>
+    <string name="language_thai">Thai</string>
+    <string name="language_indonesian">Indonesian</string>
+    <string name="language_french">French</string>
+    <string name="language_german">German</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_portuguese">Portuguese</string>
+    <string name="language_russian">Russian</string>
+    <string name="language_arabic">Arabic</string>
+    <string name="language_hindi">Hindi</string>
+
+    <!-- States -->
+    <string name="translation_state_idle">Enter text and tap Translate</string>
+    <string name="translation_state_translating">Translating…</string>
+    <string name="translation_state_detecting">Detecting language…</string>
+
+    <!-- Errors -->
+    <string name="translation_error_no_text">No text to translate</string>
+    <string name="translation_error_same_language">Source and target language are the same</string>
+    <string name="translation_error_cloud_disabled">Cloud features are disabled. Enable them in Settings to use translation.</string>
+    <string name="translation_error_api_key_missing">Enter a Gemini API key in Settings to use cloud translation.</string>
+    <string name="translation_error_invalid_api_key">The Gemini API key is invalid. Check it in Settings.</string>
+    <string name="translation_error_quota">Gemini quota exhausted. Try again in %1$d s.</string>
+    <string name="translation_error_unavailable">Translation service unavailable. Try again.</string>
+    <string name="translation_error_input_too_large">Text is too large. Maximum %1$d characters.</string>
+    <string name="translation_error_on_device_unavailable">On-device translation not available for this language pair.</string>
+    <string name="translation_error_on_device_download">On-device translation model not installed. Tap to install.</string>
+    <string name="translation_error_safety_blocked">Translation was blocked for safety reasons.</string>
+    <string name="translation_error_generic">Translation failed. Tap to retry.</string>
+
+    <!-- Toasts -->
+    <string name="translation_toast_copied">Translation copied</string>
+    <string name="translation_toast_inserted">Translation inserted</string>
+    <string name="translation_toast_source_same">Source and target language are the same</string>
+
+    <!-- Provider Labels -->
+    <string name="translation_provider_gemini">Gemini</string>
+    <string name="translation_provider_on_device">On-device</string>
+
+    <!-- Accessibility -->
+    <string name="translation_content_desc_source_field">Source text input</string>
+    <string name="translation_content_desc_result_field">Translation result</string>
+    <string name="translation_content_desc_swap_button">Swap source and target languages</string>
+    <string name="translation_content_desc_source_language">Source language: %1$s</string>
+    <string name="translation_content_desc_target_language">Target language: %1$s</string>
+    <string name="translation_content_desc_translate_button">Translate text</string>
+    <string name="translation_content_desc_copy_button">Copy translation</string>
+    <string name="translation_content_desc_insert_button">Insert translation into text field</string>
+    <string name="translation_content_desc_close_button">Close translation panel</string>
+
+    <!-- Settings -->
+    <string name="translation_settings_title">Translation Settings</string>
+    <string name="translation_quality_title">Translation quality</string>
+    <string name="translation_quality_summary">Fast: faster results. High: better quality.</string>
+    <string name="translation_quality_fast">Fast</string>
+    <string name="translation_quality_high">High quality</string>
+    <string name="translation_source_language_title">Default source language</string>
+    <string name="translation_source_language_summary">Leave empty for auto-detect</string>
+    <string name="translation_target_language_title">Default target language</string>
+    <string name="translation_on_device_fallback_title">Use on-device translation</string>
+    <string name="translation_on_device_fallback_summary">Use local translation when cloud is unavailable (on supported devices)</string>
+</resources>

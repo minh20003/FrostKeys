@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="top"
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:paddingTop="6dp"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp">
+
+    <!-- Header with title and back button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="0dp"
+        android:paddingTop="0dp"
+        android:layout_marginBottom="4dp">
+
+        <ImageButton
+            android:id="@+id/btn_back_translation"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="@string/translation_action_close"
+            app:tint="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:id="@+id/tv_translation_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/translation_title"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
+        <!-- Provider indicator chip -->
+        <TextView
+            android:id="@+id/tv_provider_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_ai_chip"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="@string/translation_provider_gemini"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Language selection row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp"
+        android:paddingHorizontal="4dp">
+
+        <!-- Source language spinner -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/translation_state_idle"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="11sp"
+                android:layout_marginBottom="2dp" />
+
+            <Spinner
+                android:id="@+id/spinner_source_language"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_ai_chip"
+                android:dropDownWidth="match_parent"
+                android:paddingHorizontal="8dp" />
+        </LinearLayout>
+
+        <!-- Swap button -->
+        <ImageButton
+            android:id="@+id/btn_swap_languages"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="8dp"
+            android:src="@drawable/ic_swap"
+            android:background="@drawable/bg_ai_chip"
+            android:contentDescription="@string/translation_content_desc_swap_button"
+            app:tint="?android:attr/textColorPrimary" />
+
+        <!-- Target language spinner -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/translation_title"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="11sp"
+                android:layout_marginBottom="2dp" />
+
+            <Spinner
+                android:id="@+id/spinner_target_language"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_ai_chip"
+                android:dropDownWidth="match_parent"
+                android:paddingHorizontal="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Source text input area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="6dp"
+        android:minHeight="80dp"
+        android:maxHeight="140dp"
+        android:background="@drawable/bg_ai_output">
+
+        <ScrollView
+            android:id="@+id/sv_source_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbarStyle="outsideOverlay">
+
+            <EditText
+                android:id="@+id/et_source_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="80dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:gravity="top|start"
+                android:hint="@string/translation_source_hint"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textColorHint="?android:attr/textColorSecondary"
+                android:textSize="16sp"
+                android:inputType="textMultiLine|textCapSentences"
+                android:background="@android:color/transparent"
+                android:importantForAutofill="no"
+                android:lineSpacingExtra="2dp" />
+        </ScrollView>
+
+        <!-- Character count -->
+        <TextView
+            android:id="@+id/tv_char_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Loading indicator -->
+    <FrameLayout
+        android:id="@+id/loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progress_translating"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/tv_loading_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:text="@string/translation_state_translating"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="14sp" />
+    </FrameLayout>
+
+    <!-- Error state -->
+    <TextView
+        android:id="@+id/tv_error_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:background="@drawable/bg_ai_output"
+        android:textColor="#FF6B6B"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <!-- Result text area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="6dp"
+        android:minHeight="60dp"
+        android:maxHeight="120dp"
+        android:background="@drawable/bg_ai_output">
+
+        <ScrollView
+            android:id="@+id/sv_result_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbarStyle="outsideOverlay">
+
+            <TextView
+                android:id="@+id/tv_result_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:gravity="top|start"
+                android:hint="@string/translation_result_hint"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textColorHint="?android:attr/textColorSecondary"
+                android:textSize="16sp"
+                android:lineSpacingExtra="2dp"
+                android:background="@android:color/transparent" />
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- Action buttons row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="0dp"
+        android:paddingBottom="0dp">
+
+        <!-- Translate / Retry button -->
+        <Button
+            android:id="@+id/btn_translate"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_pill_button"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:text="@string/translation_action_translate"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:paddingHorizontal="20dp"
+            android:layout_marginEnd="8dp"
+            android:elevation="0dp"
+            android:stateListAnimator="@null" />
+
+        <!-- Copy button -->
+        <Button
+            android:id="@+id/btn_copy_translation"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_ai_chip"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:text="@string/translation_action_copy"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textAllCaps="false"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="8dp"
+            android:elevation="0dp"
+            android:stateListAnimator="@null" />
+
+        <!-- Insert button -->
+        <Button
+            android:id="@+id/btn_insert_translation"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_ai_chip"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:text="@string/translation_action_insert"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textAllCaps="false"
+            android:paddingHorizontal="16dp"
+            android:elevation="0dp"
+            android:stateListAnimator="@null" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Delete/backspace button -->
+        <helium314.keyboard.keyboard.internal.AccessibleImageButton
+            android:id="@+id/btn_delete_text"
+            android:layout_width="48dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_ai_chip"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:src="@drawable/sym_keyboard_delete_lxx"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            app:tint="?android:attr/textColorPrimary"
+            android:contentDescription="@string/delete" />
+    </LinearLayout>
+</LinearLayout>

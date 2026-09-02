@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!--
+    Japanese, Chinese, Korean, and Thai intentionally inherit this English fallback
+    in the personal VN build. Vietnamese completeness is enforced separately by
+    verifyVietnameseTranslationParity.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Stable AI-tool ids live in AiWritingToolsView; only their presentation is localized. -->
+    <string name="ai_tool_spell_check">Fix spelling</string>
+    <string name="ai_tool_rewrite">Rewrite</string>
+    <string name="ai_tool_formal">Formal</string>
+    <string name="ai_tool_friendly">Friendly</string>
+    <string name="ai_tool_concise">Concise</string>
+    <string name="ai_placeholder_no_text">Write something first to use the AI writing tools.</string>
+    <string name="ai_placeholder_select_tool">Choose a tool above to begin…</string>
+    <string name="ai_thinking">Thinking…</string>
+    <string name="ai_no_variations">No variations were returned.</string>
+    <string name="ai_error_cloud_disabled">Cloud features are disabled. Enable them in Settings to use the AI writing tools.</string>
+    <string name="ai_error_prefix">Error: %1$s</string>
+    <string name="ai_error_input_too_large">The selected text is too large for the AI writing tools.</string>
+    <string name="ai_error_api_key_missing">Enter a Gemini API key in Settings first.</string>
+    <string name="ai_error_models_initializing">AI models are being prepared. Try again in a few seconds.</string>
+    <string name="ai_error_generation_in_progress">AI is already generating. Wait for the current request to finish.</string>
+    <string name="ai_error_unavailable">AI is currently unavailable. Try again later.</string>
+    <string name="ai_error_model_list_refreshed">The AI model list was refreshed. Tap the tool again.</string>
+    <string name="ai_error_invalid_api_key">The Gemini API key is invalid. Check it in Settings.</string>
+    <string name="ai_error_empty_response">AI returned an empty response. Try again.</string>
+    <string name="ai_error_invalid_response">AI returned an invalid response.</string>
+    <string name="ai_error_quota">Gemini quota is temporarily exhausted. Try again in %1$d s.</string>
+    <string name="ai_toast_no_text">There is no text to process.</string>
+    <string name="ai_toast_text_replaced">Text replaced</string>
+    <string name="ai_toast_copied">Copied to clipboard</string>
+    <string name="ai_clipboard_label">AI result</string>
+    <string name="ai_visual_effects">AI visual effects</string>
+    <string name="ai_visual_effects_summary">Auto reduces effects on low-power or low-memory devices.</string>
+    <string name="ai_visual_effects_auto">Auto</string>
+    <string name="ai_visual_effects_full">Full</string>
+    <string name="ai_visual_effects_reduced">Reduced</string>
+    <string name="ai_visual_effects_off">Off</string>
+</resources>

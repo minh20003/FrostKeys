@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <!-- Main settings screen -->
+    <string name="settings_group_general">Chung</string>
+    <string name="settings_group_typing_input">Gõ và nhập</string>
+    <string name="settings_group_more">Thêm</string>
+    <string name="settings_main_preferences_summary">Âm thanh phím, rung và hành vi chung</string>
+    <string name="settings_main_appearance_summary">Chủ đề, chiều cao bàn phím và kiểu hiển thị</string>
+    <string name="settings_main_toolbar_summary">Tùy chỉnh bố cục thanh công cụ và các nút đã ghim</string>
+    <string name="settings_main_cloud_summary">Trợ lý Gemini, công cụ thông minh và tìm GIF</string>
+    <string name="settings_main_gesture_summary">Nhập vuốt, màu vệt và thao tác cử chỉ</string>
+    <string name="settings_main_gesture_data_summary">Quản lý dữ liệu thu thập cho cử chỉ</string>
+    <string name="settings_main_correction_summary">Tự sửa, chặn từ ngữ nhạy cảm và khoảng cách</string>
+    <string name="settings_main_layouts_summary">Hàng số, ký hiệu và ký tự thay thế</string>
+    <string name="settings_main_dictionary_summary">Gợi ý từ, dự đoán emoji và từ điển cá nhân</string>
+    <string name="settings_main_advanced_summary">Cài đặt gỡ lỗi, bảng nhớ tạm và tính năng thử nghiệm</string>
+    <string name="settings_main_about_summary">Phiên bản ứng dụng, giấy phép và chính sách quyền riêng tư</string>
+    <string name="quick_setup_complete_title">Thiết lập đã hoàn tất!</string>
+    <string name="quick_setup_complete_summary">Mọi cài đặt thiết yếu đã được cấu hình thành công.</string>
+    <string name="backup_restore_message">Sao lưu vào hoặc tải từ tệp. Cảnh báo: khôi phục sẽ ghi đè dữ liệu hiện có.</string>
+
+    <!-- Welcome wizard -->
+    <string name="welcome_wizard_start_action">Bắt đầu</string>
+    <string name="welcome_wizard_configure_keyboard">Tùy chỉnh bàn phím</string>
+    <string name="welcome_wizard_enable_and_switch_toast">Hãy bật và chuyển sang FrostKeys trước.</string>
+    <string name="welcome_wizard_welcome_to">Chào mừng đến với</string>
+    <string name="welcome_wizard_app_name">FrostKeys</string>
+    <string name="welcome_wizard_lets_get_you">Hãy bắt đầu</string>
+    <string name="welcome_wizard_started">ngay</string>
+    <string name="welcome_wizard_enable_title">Bật FrostKeys</string>
+    <string name="welcome_wizard_enable_summary">Chọn “FrostKeys” trong cài đặt Ngôn ngữ và phương thức nhập.</string>
+    <string name="welcome_wizard_enable_first_toast">Hãy bật FrostKeys trước.</string>
+    <string name="welcome_wizard_switch_title">Chuyển sang FrostKeys</string>
+    <string name="welcome_wizard_switch_summary">Chọn “FrostKeys” làm phương thức nhập văn bản đang hoạt động.</string>
+    <string name="welcome_wizard_switch_first_toast">Hãy chuyển sang FrostKeys trước.</string>
+    <string name="welcome_wizard_essential_title">Gõ tiếng Việt và quyền riêng tư</string>
+    <string name="welcome_wizard_essential_summary">Telex đã sẵn sàng mặc định; mọi tính năng tùy chọn đều do bạn quyết định.</string>
+    <string name="welcome_wizard_vietnamese_input_title">Tiếng Việt Telex và VNI</string>
+    <string name="welcome_wizard_vietnamese_input_summary">Telex được chọn mặc định. Bạn có thể bật VNI có hàng số hoặc nhập trực tiếp sau này.</string>
+    <string name="welcome_wizard_privacy_title">Ưu tiên quyền riêng tư</string>
+    <string name="welcome_wizard_privacy_summary">Dữ liệu gõ và học chỉ ở trên thiết bị này. Danh bạ và ảnh chụp trong bảng nhớ tạm vẫn tắt cho đến khi bạn tự bật và cấp quyền.</string>
+    <string name="welcome_wizard_cloud_title">Tính năng đám mây (tùy chọn)</string>
+    <string name="welcome_wizard_cloud_summary_off">Tắt mặc định: không có yêu cầu đám mây nào được gửi đi. Chỉ bật nếu bạn muốn dùng AI hoặc tìm GIF với khóa API của mình.</string>
+    <string name="welcome_wizard_cloud_summary_on">Đã bật. Bạn có thể thêm khóa API sau trong Cài đặt &gt; Đám mây; hãy tắt bất cứ lúc nào để hủy yêu cầu đám mây.</string>
+
+    <!-- Search, crash-report and Telegram dialogs -->
+    <string name="search_settings_placeholder">Tìm trong phần cài đặt</string>
+    <string name="settings_navigation_back">Quay lại</string>
+    <string name="settings_more_options">Tùy chọn khác</string>
+    <string name="crash_reports_action_ignore">Bỏ qua</string>
+    <string name="crash_reports_action_get">Lấy</string>
+    <string name="crash_reports_found">Đã tìm thấy tệp báo cáo sự cố</string>
+    <string name="telegram_logo_content_description">Biểu trưng Telegram</string>
+    <string name="telegram_invite_title">Tham gia kênh Telegram</string>
+    <string name="telegram_invite_summary">Nhận thông báo, xem trước sớm và chia sẻ ý tưởng. Nhấn vào đây để tham gia.</string>
+    <string name="telegram_popup_title">Luôn kết nối</string>
+    <string name="telegram_popup_message">Tham gia kênh Telegram để nhận thông báo cập nhật, xem trước sớm và chia sẻ phản hồi, ý tưởng. Hãy đồng hành cùng quá trình phát triển ứng dụng.</string>
+    <string name="telegram_maybe_later">Để sau</string>
+    <string name="telegram_join_now">Tham gia ngay</string>
+
+    <!-- AI writing panel XML -->
+    <string name="ai_action_back">Quay lại</string>
+    <string name="ai_action_copy">Sao chép</string>
+    <string name="ai_writing_tools_title">Công cụ viết bằng AI</string>
+</resources>

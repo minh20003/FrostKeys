@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Retained non-Vietnamese locales intentionally use the verified English fallback. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="klipy_cloud_disabled">Cloud features are disabled. Enable them in Settings to use Klipy.</string>
+    <string name="klipy_search_cloud_disabled">Cloud features are disabled. Enable them in Settings to search Klipy.</string>
+    <string name="klipy_search_api_key_missing">Add a Klipy API key in Cloud settings to search.</string>
+    <string name="klipy_search_network_error">Klipy could not be reached. Check your connection and try again.</string>
+    <string name="klipy_search_response_error">Klipy returned an invalid response. Try again later.</string>
+    <string name="klipy_error_sharing">Could not share the media.</string>
+    <string name="klipy_processing_failed">Could not process this sticker.</string>
+    <string name="klipy_download_failed">Could not download this media.</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Lazily placed by main_keyboard_frame's ViewStub. The custom view inflates its own internal
+    content only when a translation action opens this panel.
+-->
+<helium314.keyboard.keyboard.internal.TranslationView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/translation_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone" />

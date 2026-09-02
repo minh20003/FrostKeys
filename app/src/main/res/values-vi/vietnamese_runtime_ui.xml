@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <!-- Chuỗi thời gian chạy, tách khỏi mã để áp dụng theo ngôn ngữ giao diện. -->
+    <string name="frosted_profile_light">Hồ sơ sáng</string>
+    <string name="frosted_profile_dark">Hồ sơ tối</string>
+    <string name="frosted_wallpaper_test">Thử với hình nền của bạn</string>
+    <string name="frosted_wallpaper_change">Đổi hình nền</string>
+
+    <string name="theme_style_default_description">Giao diện hiện đại tương tự bàn phím Android mặc định. Tự điều chỉnh tỉ lệ đệm để tạo bố cục quen thuộc.</string>
+    <string name="theme_style_material_description">Giao diện Android Lollipop cổ điển (Material Design) với các phím chữ nhật tiêu chuẩn.</string>
+    <string name="theme_style_holo_description">Giao diện hoài cổ từ thời Android KitKat với các phím phẳng, sắc nét.</string>
+    <string name="theme_style_rounded_description">Thiết kế mềm mại với phím hình viên thuốc và cửa sổ bật lên tròn tương ứng.</string>
+    <string name="theme_style_circle_description">Bố cục tối giản, trong đó mọi phím đều là hình tròn.</string>
+
+    <string name="emoji_android_version">Android %s</string>
+    <string name="emoji_version_unknown">không rõ phiên bản</string>
+    <string name="emoji_current_version">phiên bản hiện tại</string>
+    <string name="emoji_unsupported_warning">⚠️ Emoji mới hơn Android %s không được hệ thống hoặc phông chữ của bạn hỗ trợ và có thể hiện thành ô vuông.</string>
+
+    <string name="debug_dump_dictionary">Xuất từ điển %s</string>
+    <string name="custom_layout_new_name">bố cục mới</string>
+    <string name="frosted_blur_unsupported_device">thiết bị này</string>
+    <string name="theme_imported_colors">màu đã nhập</string>
+    <string name="gesture_data_links_visualizer">Công cụ trực quan hóa dữ liệu cử chỉ:</string>
+    <string name="gesture_data_share_chooser">Chia sẻ dữ liệu cử chỉ</string>
+    <string name="gesture_data_links_content_description">Liên kết về dữ liệu cử chỉ</string>
+    <string name="gesture_data_links_wiki">Wiki FrostKeys</string>
+    <string name="gesture_data_mail_address_label">địa chỉ email</string>
+    <string name="gesture_data_mail_subject">Dữ liệu cử chỉ FrostKeys %s</string>
+    <string name="persistent_emoji_remove_row">Bỏ hàng</string>
+    <string name="clipboard_copied_text_label">văn bản đã sao chép</string>
+</resources>

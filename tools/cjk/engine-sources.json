@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "purpose": "Source acquisition only; this file is not an APK engine bundle manifest.",
+  "engines": [
+    {
+      "id": "rime",
+      "project": "librime",
+      "version": "1.16.1",
+      "commit": "5d7467d037938a17abb394f560f016adc9f76e14",
+      "checkoutCommit": "de4700e9f6b75b109910613df907965e3cbe0567",
+      "fetchRef": "refs/tags/1.16.1",
+      "checkoutSource": "https://github.com/rime/librime.git",
+      "manifestSource": "https://github.com/rime/librime",
+      "license": "BSD-3-Clause",
+      "status": "source-pinned-not-bundled"
+    },
+    {
+      "id": "mozc",
+      "project": "Mozc",
+      "version": "commit-851c3fe",
+      "commit": "851c3fe33060d2a6090363e4d7ec44fafde2c03d",
+      "checkoutCommit": "851c3fe33060d2a6090363e4d7ec44fafde2c03d",
+      "fetchRef": "851c3fe33060d2a6090363e4d7ec44fafde2c03d",
+      "checkoutSource": "https://github.com/google/mozc.git",
+      "manifestSource": "https://github.com/google/mozc",
+      "license": "BSD-3-Clause",
+      "status": "source-pinned-not-bundled"
+    }
+  ]
+}

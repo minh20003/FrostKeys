@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Retained non-Vietnamese locales intentionally use the verified English fallback. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="subtype_vietnamese_telex">%s (Telex)</string>
+    <string name="subtype_vietnamese_vni">%s (VNI)</string>
+    <string name="subtype_vietnamese_raw">%s (QWERTY)</string>
+    <string name="vietnamese_tone_placement_title">Vietnamese tone placement</string>
+    <string name="vietnamese_tone_placement_summary">Choose how tones are placed in “hòa” and “thúy”.</string>
+    <string name="vietnamese_tone_placement_common">Common — hòa, thúy</string>
+    <string name="vietnamese_tone_placement_alternate">Alternate — hoà, thuý</string>
+    <string name="vietnamese_vni_number_row_note">The number row is enabled automatically for VNI input (1–0).</string>
+    <string name="sync_enabled_languages_with_os_switcher">Sync enabled languages with the system switcher</string>
+</resources>

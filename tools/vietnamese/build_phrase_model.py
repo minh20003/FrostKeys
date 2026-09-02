@@ -1,0 +1,214 @@
+#!/usr/bin/env python3
+"""Build or verify FrostKeys' deliberately bounded Vietnamese phrase model.
+
+The checked-in source is a small original seed, not a hidden scrape.  This script is intentionally
+dependency-free and deterministic: it normalises to NFC, rejects malformed rows, bounds every
+token, sorts the model, and emits both the APK artifact and a manifest containing source and
+artifact hashes. The original seed is reviewed to contain no PII; this small parser does not claim
+to be an automated PII classifier. It never accesses the network.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+import unicodedata
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable
+
+
+FORMAT_VERSION = 1
+VERSION = "seed-v1"
+MAX_ENTRIES = 128
+MAX_CANDIDATES_PER_CONTEXT = 3
+MAX_TOKEN_CODEPOINTS = 48
+MIN_SCORE = 1
+MAX_SCORE = 1000
+SOURCE_DESCRIPTION = "FrostKeys original curated Vietnamese phrase seed v1"
+SOURCE_LICENSE = "GPL-3.0-only"
+
+
+@dataclass(frozen=True)
+class Entry:
+    order: int
+    score: int
+    context: tuple[str, ...]
+    candidate: str
+
+    @property
+    def normalized_context(self) -> tuple[str, ...]:
+        return tuple(_lookup_token(token) for token in self.context)
+
+    @property
+    def normalized_candidate(self) -> str:
+        return _lookup_token(self.candidate)
+
+
+def _sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _normalise_token(value: str) -> str:
+    value = unicodedata.normalize("NFC", value.strip())
+    if not value:
+        raise ValueError("empty token")
+    if len(value) > MAX_TOKEN_CODEPOINTS:
+        raise ValueError(f"token exceeds {MAX_TOKEN_CODEPOINTS} code points")
+    for index, character in enumerate(value):
+        category = unicodedata.category(character)
+        if category.startswith(("L", "M")):
+            continue
+        if character in "'\u2019" and 0 < index < len(value) - 1:
+            continue
+        raise ValueError(f"invalid character {character!r} in token")
+    return value
+
+
+def _lookup_token(value: str) -> str:
+    # Python casefold is deterministic and intentionally only used for lookup/deduplication. The
+    # artifact preserves display casing such as "Việt" -> "Nam".
+    return _normalise_token(value).casefold()
+
+
+def parse_source(source: bytes) -> list[Entry]:
+    try:
+        text = source.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise ValueError("source is not valid UTF-8") from error
+
+    entries: list[Entry] = []
+    seen: set[tuple[tuple[str, ...], str]] = set()
+    candidates_per_context: dict[tuple[str, ...], int] = {}
+    for line_number, raw_line in enumerate(text.splitlines(), start=1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = raw_line.split("\t")
+        try:
+            order = int(parts[0])
+            score = int(parts[1])
+        except (IndexError, ValueError) as error:
+            raise ValueError(f"line {line_number}: invalid order or score") from error
+        if order not in (2, 3):
+            raise ValueError(f"line {line_number}: order must be 2 or 3")
+        if len(parts) != order + 2:
+            raise ValueError(f"line {line_number}: expected {order + 2} TSV columns")
+        if not MIN_SCORE <= score <= MAX_SCORE:
+            raise ValueError(f"line {line_number}: score must be {MIN_SCORE}..{MAX_SCORE}")
+        try:
+            context = tuple(_normalise_token(value) for value in parts[2:-1])
+            candidate = _normalise_token(parts[-1])
+        except ValueError as error:
+            raise ValueError(f"line {line_number}: {error}") from error
+        lookup_key = (tuple(_lookup_token(value) for value in context), _lookup_token(candidate))
+        if lookup_key in seen:
+            raise ValueError(f"line {line_number}: duplicate context/candidate")
+        seen.add(lookup_key)
+        context_key = lookup_key[0]
+        candidates_per_context[context_key] = candidates_per_context.get(context_key, 0) + 1
+        if candidates_per_context[context_key] > MAX_CANDIDATES_PER_CONTEXT:
+            raise ValueError(
+                f"line {line_number}: more than {MAX_CANDIDATES_PER_CONTEXT} candidates for one context",
+            )
+        entries.append(Entry(order, score, context, candidate))
+        if len(entries) > MAX_ENTRIES:
+            raise ValueError(f"model exceeds {MAX_ENTRIES} entries")
+
+    if not entries:
+        raise ValueError("source has no entries")
+    return sorted(
+        entries,
+        key=lambda entry: (
+            entry.order,
+            entry.normalized_context,
+            -entry.score,
+            entry.normalized_candidate,
+        ),
+    )
+
+
+def render_model(entries: Iterable[Entry]) -> bytes:
+    lines = [
+        "# SPDX-License-Identifier: GPL-3.0-only",
+        "# Generated by tools/vietnamese/build_phrase_model.py; do not edit manually.",
+        "# format: order<TAB>score<TAB>context word(s)<TAB>candidate",
+    ]
+    for entry in entries:
+        lines.append("\t".join((str(entry.order), str(entry.score), *entry.context, entry.candidate)))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def render_manifest(source: bytes, artifact: bytes, entry_count: int) -> bytes:
+    manifest = {
+        "artifact": "dicts/vi_phrase_model_v1.tsv",
+        "byteCount": len(artifact),
+        "formatVersion": FORMAT_VERSION,
+        "license": SOURCE_LICENSE,
+        "locale": "vi",
+        "maxCandidatesPerContext": MAX_CANDIDATES_PER_CONTEXT,
+        "maxEntries": MAX_ENTRIES,
+        "sha256": _sha256(artifact),
+        "source": SOURCE_DESCRIPTION,
+        "sourceByteCount": len(source),
+        "sourceLicense": SOURCE_LICENSE,
+        "sourceSha256": _sha256(source),
+        "version": VERSION,
+        "entryCount": entry_count,
+    }
+    return (json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+
+def expected_outputs(source_path: Path) -> tuple[bytes, bytes]:
+    source = source_path.read_bytes()
+    entries = parse_source(source)
+    artifact = render_model(entries)
+    manifest = render_manifest(source, artifact, len(entries))
+    return artifact, manifest
+
+
+def _write_or_check(path: Path, expected: bytes, check: bool) -> bool:
+    actual = path.read_bytes() if path.is_file() else None
+    if check:
+        if actual != expected:
+            print(f"out of date: {path}", file=sys.stderr)
+            return False
+        return True
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(expected)
+    return True
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source", type=Path, default=Path(__file__).with_name("seed_vi_phrases_v1.tsv"))
+    parser.add_argument(
+        "--artifact",
+        type=Path,
+        default=Path(__file__).parents[2] / "app/src/main/assets/dicts/vi_phrase_model_v1.tsv",
+    )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=Path(__file__).parents[2] / "app/src/main/assets/manifests/phrase_model_vi.json",
+    )
+    parser.add_argument("--check", action="store_true", help="fail if checked-in outputs differ")
+    parser.add_argument("--print", action="store_true", dest="print_artifact", help="write expected artifact to stdout")
+    args = parser.parse_args()
+
+    try:
+        artifact, manifest = expected_outputs(args.source)
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
+    if args.print_artifact:
+        sys.stdout.buffer.write(artifact)
+        return 0
+    success = _write_or_check(args.artifact, artifact, args.check)
+    success = _write_or_check(args.manifest, manifest, args.check) and success
+    return 0 if success else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

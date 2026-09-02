@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Retained non-Vietnamese locales intentionally use the verified English fallback. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Runtime text that was previously embedded in Compose or Java code. -->
+    <string name="frosted_profile_light">Light profile</string>
+    <string name="frosted_profile_dark">Dark profile</string>
+    <string name="frosted_wallpaper_test">Test with your wallpaper</string>
+    <string name="frosted_wallpaper_change">Change wallpaper</string>
+
+    <string name="theme_style_default_description">Matches the modern look and feel of the default Android keyboard. Adjusts padding scales automatically for a familiar layout.</string>
+    <string name="theme_style_material_description">The classic Android Lollipop (Material Design) look with standard rectangular keys.</string>
+    <string name="theme_style_holo_description">A retro Android KitKat-era style with crisp, flat keys.</string>
+    <string name="theme_style_rounded_description">A soft design with pill-shaped keys and matching circular popups.</string>
+    <string name="theme_style_circle_description">A minimalist layout where every key is a circle.</string>
+
+    <string name="emoji_android_version">Android %s</string>
+    <string name="emoji_version_unknown">unknown version</string>
+    <string name="emoji_current_version">current version</string>
+    <string name="emoji_unsupported_warning">⚠️ Warning: Emoji above Android %s are not supported by your system or font and might be displayed as tofu.</string>
+
+    <string name="debug_dump_dictionary">Dump %s dictionary</string>
+    <string name="custom_layout_new_name">new layout</string>
+    <string name="frosted_blur_unsupported_device">this device</string>
+    <string name="theme_imported_colors">imported colors</string>
+    <string name="gesture_data_links_visualizer">Tool for visualizing gesture data:</string>
+    <string name="gesture_data_share_chooser">Share gesture data</string>
+    <string name="gesture_data_links_content_description">Gesture data links</string>
+    <string name="gesture_data_links_wiki">FrostKeys wiki</string>
+    <string name="gesture_data_mail_address_label">mail address</string>
+    <string name="gesture_data_mail_subject">FrostKeys %s gesture data</string>
+    <string name="persistent_emoji_remove_row">Remove row</string>
+    <string name="clipboard_copied_text_label">copied text</string>
+</resources>

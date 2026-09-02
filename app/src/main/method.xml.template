@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2008 The Android Open Source Project
+    modified
+    SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
+-->
+
+<!--
+    Personal FrostKeys VN build: only declare keyboard subtypes with a usable offline
+    implementation. The Gradle generator inserts Japanese/Chinese only when their verified native
+    data bundles are physically part of the same APK; a bundle-less build advertises neither.
+-->
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+        android:settingsActivity="helium314.keyboard.settings.SettingsActivity"
+        android:isDefault="@bool/im_is_default"
+        android:supportsSwitchingToNextInputMethod="true"
+        android:supportsInlineSuggestions="true">
+
+    <!-- Keep this stable ID: existing English (US) selections retain their subtype. -->
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_en_US"
+        android:subtypeId="0xc9194f98"
+        android:imeSubtypeLocale="en_US"
+        android:languageTag="en-US"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="TrySuppressingImeSwitcher,AsciiCapable,SupportTouchPositionCorrection,EmojiCapable"
+        android:isAsciiCapable="true" />
+
+    <!-- Telex keeps the upstream Vietnamese subtype ID for a safe upgrade path. -->
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_vietnamese_telex"
+        android:subtypeId="0x93972eee"
+        android:imeSubtypeLocale="vi"
+        android:languageTag="vi"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:qwerty,CombiningRules=vi_telex,AsciiCapable,EmojiCapable"
+        android:isAsciiCapable="true" />
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_vietnamese_vni"
+        android:subtypeId="0x7c16f001"
+        android:imeSubtypeLocale="vi"
+        android:languageTag="vi"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:qwerty,CombiningRules=vi_vni,AsciiCapable,EmojiCapable"
+        android:isAsciiCapable="true" />
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_vietnamese_raw"
+        android:subtypeId="0x7c16f002"
+        android:imeSubtypeLocale="vi"
+        android:languageTag="vi"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:qwerty,CombiningRules=vi_raw,AsciiCapable,EmojiCapable"
+        android:isAsciiCapable="true" />
+
+    <!-- The existing offline Hangul layouts remain available. -->
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_generic"
+        android:subtypeId="0x456d04f2"
+        android:imeSubtypeLocale="ko"
+        android:languageTag="ko"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:korean,CombiningRules=hangul,SupportTouchPositionCorrection,EmojiCapable"
+        android:isAsciiCapable="false" />
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_generic_phonetic"
+        android:subtypeId="0x3f5a9c12"
+        android:imeSubtypeLocale="ko"
+        android:languageTag="ko"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:korean_phonetic,CombiningRules=hangul,SupportTouchPositionCorrection,EmojiCapable"
+        android:isAsciiCapable="false" />
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_generic_sebeolsik_390"
+        android:subtypeId="0xb0bbe261"
+        android:imeSubtypeLocale="ko"
+        android:languageTag="ko"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:korean_sebeolsik_390,CombiningRules=hangul,SupportTouchPositionCorrection,EmojiCapable"
+        android:isAsciiCapable="false" />
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_generic_sebeolsik_final"
+        android:subtypeId="0xb6774038"
+        android:imeSubtypeLocale="ko"
+        android:languageTag="ko"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:korean_sebeolsik_final,CombiningRules=hangul,SupportTouchPositionCorrection,EmojiCapable"
+        android:isAsciiCapable="false" />
+
+    <!-- FROSTKEYS_MOZC_SUBTYPE -->
+
+    <!-- FROSTKEYS_RIME_SUBTYPE -->
+
+    <subtype android:icon="@drawable/ic_ime_switcher"
+        android:label="@string/subtype_generic"
+        android:subtypeId="0x1f94d5d4"
+        android:imeSubtypeLocale="th"
+        android:languageTag="th"
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:thai,NoShiftProximityCorrection,EmojiCapable"
+        android:isAsciiCapable="false" />
+</input-method>

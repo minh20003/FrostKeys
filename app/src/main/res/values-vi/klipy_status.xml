@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<resources>
+    <string name="klipy_cloud_disabled">Các tính năng đám mây đang tắt. Hãy bật chúng trong Cài đặt để dùng Klipy.</string>
+    <string name="klipy_search_cloud_disabled">Các tính năng đám mây đang tắt. Hãy bật chúng trong Cài đặt để tìm trên Klipy.</string>
+    <string name="klipy_search_api_key_missing">Hãy thêm khóa API Klipy trong phần Cài đặt đám mây để tìm kiếm.</string>
+    <string name="klipy_search_network_error">Không thể kết nối tới Klipy. Hãy kiểm tra mạng rồi thử lại.</string>
+    <string name="klipy_search_response_error">Klipy trả về phản hồi không hợp lệ. Hãy thử lại sau.</string>
+    <string name="klipy_error_sharing">Không thể gửi nội dung đa phương tiện.</string>
+    <string name="klipy_processing_failed">Không thể xử lý nhãn dán này.</string>
+    <string name="klipy_download_failed">Không thể tải nội dung đa phương tiện này.</string>
+</resources>
